@@ -1530,10 +1530,10 @@ body.fullscreen .lesson-info{margin-bottom:1rem;padding:1.5rem}
       <p style="margin:0.5rem 0 0;font-size:0.65rem;color:#666;">Get free at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#a78bfa;">aistudio.google.com</a> • Key stored locally only</p>
     </div>
     <div class="chat-input-area">
-      <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" disabled>
+      <input type="text" id="chatInput" placeholder="Chat here... use @Amadeus to ask AI" onkeydown="if(event.key==='Enter')sendMessage()" disabled>
       <button class="chat-send" onclick="sendMessage()" disabled>➤</button>
     </div>
-    <p class="chat-powered">💡 Live group chat • All visitors can see messages</p>
+    <p class="chat-powered">💡 Live group chat • Type @Amadeus to ask AI</p>
   </div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -2454,7 +2454,7 @@ async function initChat() {
 function fallbackToLocalChat() {
   isFirebaseAvailable = false;
   document.getElementById('chatMessages').innerHTML = '';
-  addMessageToUI('System', '💡 Local chat mode - messages saved on your device only. Ask the AI about this content!', 'system');
+  addMessageToUI('System', '💡 Local chat mode. Type @Amadeus to ask the AI about this content!', 'system');
   loadLocalMessages();
 }
 
@@ -2555,8 +2555,10 @@ async function sendMessage() {
     saveLocalMessages();
   }
   
-  // Always get AI response if API key is available
-  if (CHAT_API_KEY) {
+  // Only get AI response if explicitly mentioned with @Amadeus, @AI, or @amadeus
+  const aiMentioned = /@(amadeus|ai|AI|Amadeus)/i.test(message);
+  
+  if (CHAT_API_KEY && aiMentioned) {
     const typingId = showTyping();
     
     try {
