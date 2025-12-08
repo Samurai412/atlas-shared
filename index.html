@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATLAS Shared Collections - Samurai412</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0f15 0%, #1a1a25 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 50px; }
+    h1 {
+      font-size: 2.8rem;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+    .subtitle { color: #888; font-size: 1.1rem; }
+    .lessons-grid { display: grid; gap: 20px; margin-top: 30px; }
+    .lesson-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+      display: block;
+    }
+    .lesson-card:hover {
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 40px rgba(124, 58, 237, 0.15);
+    }
+    .lesson-title { font-size: 1.25rem; font-weight: 600; color: #f0f0f0; margin-bottom: 8px; }
+    .lesson-meta { color: #666; font-size: 0.85rem; }
+    .lesson-arrow { float: right; color: #7c3aed; font-size: 1.5rem; opacity: 0; transition: opacity 0.3s; }
+    .lesson-card:hover .lesson-arrow { opacity: 1; }
+    .loading { text-align: center; color: #666; padding: 40px; }
+    .loading::after { content: ''; animation: dots 1.5s steps(3, end) infinite; }
+    @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
+    .empty { text-align: center; color: #666; padding: 60px 20px; background: rgba(255,255,255,0.02); border-radius: 16px; }
+    .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+    .footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); color: #555; font-size: 0.85rem; }
+    .footer a { color: #7c3aed; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 ATLAS Collection</h1>
+      <p class="subtitle">Knowledge shared by <strong>Samurai412</strong></p>
+    </header>
+    <div id="lessons" class="lessons-grid">
+      <div class="loading">Loading lessons</div>
+    </div>
+    <footer class="footer">
+      <p>Created with <a href="#">ATLAS Face</a> • Interactive Study Platform</p>
+    </footer>
+  </div>
+  <script>
+    const GITHUB_USER = 'Samurai412';
+    const REPO_NAME = 'atlas-shared';
+    
+    async function loadLessons() {
+      const container = document.getElementById('lessons');
+      try {
+        const response = await fetch('https://api.github.com/repos/' + GITHUB_USER + '/' + REPO_NAME + '/contents');
+        if (!response.ok) throw new Error('Failed to fetch');
+        const files = await response.json();
+        const lessons = files.filter(f => f.name.endsWith('.html') && f.name !== 'index.html' && f.type === 'file');
+        if (lessons.length === 0) {
+          container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>No lessons shared yet.</p><p style="margin-top: 10px; font-size: 0.9rem;">Share your first lesson from ATLAS Face!</p></div>';
+          return;
+        }
+        lessons.sort((a, b) => a.name.localeCompare(b.name));
+        container.innerHTML = lessons.map(lesson => {
+          const name = lesson.name.replace('.html', '').replace(/-/g, ' ');
+          const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+          return '<a href="' + lesson.name + '" class="lesson-card"><span class="lesson-arrow">→</span><div class="lesson-title">' + displayName + '</div><div class="lesson-meta">📄 Cards</div></a>';
+        }).join('');
+      } catch (error) {
+        console.error('Error loading lessons:', error);
+        container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load lessons.</p><p style="margin-top: 10px;"><a href="https://github.com/' + GITHUB_USER + '/' + REPO_NAME + '" style="color: #06b6d4;">View on GitHub →</a></p></div>';
+      }
+    }
+    loadLessons();
+  </script>
+</body>
+</html>
