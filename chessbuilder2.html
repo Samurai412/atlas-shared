@@ -2847,12 +2847,19 @@ async function callAI(userMessage, isIntervention = false) {
     ? recentMessages.map(m => (m.type === 'ai' ? 'Amadeus' : m.sender) + ': ' + m.text).join('\n')
     : '(No previous messages)';
   
+  // Truncate lesson context if too large (aim for ~20K chars to leave room for response)
+  const maxContextChars = 20000;
+  let truncatedContext = lessonContext;
+  if (lessonContext.length > maxContextChars) {
+    truncatedContext = lessonContext.substring(0, maxContextChars) + '\n\n[... content truncated for length ...]';
+  }
+  
   const basePrompt = `
 You are a participant in a group chat, not an AI assistant. Your name is Amadeus.
 The current user is named ` + localNickname + `.
 
 STUDY MATERIAL BEING DISCUSSED:
-` + lessonContext + `
+` + truncatedContext + `
 
 RECENT CHAT HISTORY (for context):
 ` + chatHistoryText + `
@@ -2903,12 +2910,12 @@ Your goal is to stimulate critical thinking about the content, not just recite i
     {role: 'user', content: finalUserMessage}
   ];
   
-  // Try multiple Mistral models with fallback
+  // Try multiple Mistral models with fallback (prioritize nemo for large context)
   const models = [
-    'mistral-medium-latest',
-    'mistral-small-latest',
-    'open-mistral-nemo',
-    'open-mistral-7b'
+    'open-mistral-nemo',      // 128K context - best for large study materials
+    'mistral-small-latest',   // 32K context - fast and affordable
+    'mistral-medium-latest',  // 32K context - more capable
+    'open-mistral-7b'         // 32K context - fallback
   ];
   
   let lastError = null;
