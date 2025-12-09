@@ -2580,9 +2580,11 @@ async function initChat() {
           // AI Living Presence - track messages and intervene naturally
           if (!isInitialLoad && msg.type === 'user') {
             messagesSinceAISpoke++;
+            console.log('[AI Intervention] Message count:', messagesSinceAISpoke, '/ threshold:', aiInterventionThreshold, 'API key:', !!CHAT_API_KEY, 'Speaking:', isAICurrentlySpeaking);
             
             // Check if AI should speak up naturally
             if (CHAT_API_KEY && messagesSinceAISpoke >= aiInterventionThreshold && !isAICurrentlySpeaking) {
+              console.log('[AI Intervention] Triggering intervention!');
               triggerAIIntervention();
             }
           } else if (msg.type === 'ai') {
