@@ -3119,30 +3119,23 @@ function initEditSystem() {
         cardsData[cardIndex].title = data.title;
         cardsData[cardIndex].content = data.content;
         
-        // Update DOM - always show latest from Firebase
+        // Update DOM - show latest version
         const cardElements = document.querySelectorAll('.card');
         if (cardElements[cardIndex]) {
           const cardEl = cardElements[cardIndex];
           const titleEl = cardEl.querySelector('.card-title');
           const contentEl = cardEl.querySelector('.card-content');
           
-          // Only skip update if this card is currently focused (user is typing)
-          const isFocused = document.activeElement === titleEl || document.activeElement === contentEl;
+          // Visual feedback for remote update
+          cardEl.style.boxShadow = '0 0 15px #4ade80';
+          setTimeout(() => { cardEl.style.boxShadow = ''; }, 1000);
           
-          if (!isFocused) {
-            // Show flash effect for remote update
-            cardEl.style.boxShadow = '0 0 10px #4ade80';
-            setTimeout(() => { cardEl.style.boxShadow = ''; }, 500);
-            
-            if (titleEl && titleEl.innerText !== data.title) {
-              titleEl.innerText = data.title;
-            }
-            if (contentEl && contentEl.innerText !== data.content) {
-              contentEl.innerText = data.content;
-            }
-          } else {
-            // Show indicator that someone else edited
-            showRemoteEditBadge(cardEl, data.updatedBy);
+          if (titleEl) titleEl.innerHTML = renderContent(data.title);
+          if (contentEl) contentEl.innerHTML = renderContent(data.content);
+          
+          // Show toast notification
+          if (data.updatedBy) {
+            showToast('📝 Card updated by ' + data.updatedBy);
           }
         }
         
@@ -3150,123 +3143,163 @@ function initEditSystem() {
       }
     });
     
-    // Track who is currently editing and show cursors
-    setupPresenceTracking();
+    // Listen for version history to show conflicts
+    const versionsRef = db.ref('versions/' + CONTENT_ID);
+    versionsRef.on('child_added', handleVersionAdded);
+    versionsRef.on('child_changed', handleVersionChanged);
   }
 }
 
-// Show a badge when remote user edits while you're editing
-function showRemoteEditBadge(cardEl, editor) {
-  let badge = cardEl.querySelector('.remote-edit-badge');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.className = 'remote-edit-badge';
-    badge.style.cssText = 'position:absolute;top:-8px;right:-8px;background:#f59e0b;color:#1a1a1a;padding:4px 8px;border-radius:12px;font-size:11px;font-weight:600;z-index:100;animation:pulse 0.5s;';
-    cardEl.style.position = 'relative';
-    cardEl.appendChild(badge);
+// Color palette for different authors
+const authorColors = {};
+const colorPalette = ['#f87171', '#fb923c', '#facc15', '#4ade80', '#22d3ee', '#818cf8', '#e879f9', '#f472b6'];
+let colorIndex = 0;
+
+function getAuthorColor(author) {
+  if (!authorColors[author]) {
+    authorColors[author] = colorPalette[colorIndex % colorPalette.length];
+    colorIndex++;
   }
-  badge.textContent = '📝 ' + editor + ' editing...';
+  return authorColors[author];
+}
+
+// Handle new version being added
+function handleVersionAdded(snapshot) {
+  const cardIndex = parseInt(snapshot.key);
+  if (isNaN(cardIndex)) return;
   
-  // Remove after 3 seconds
-  clearTimeout(badge._timeout);
-  badge._timeout = setTimeout(() => badge.remove(), 3000);
+  // Check for recent versions (within last 30 seconds) from different authors
+  checkForConflicts(cardIndex);
 }
 
-// Setup presence tracking to show who is editing which card
-function setupPresenceTracking() {
+// Handle version changes
+function handleVersionChanged(snapshot) {
+  const cardIndex = parseInt(snapshot.key);
+  if (isNaN(cardIndex)) return;
+  
+  checkForConflicts(cardIndex);
+}
+
+// Check for conflicts and show version history if multiple recent edits
+async function checkForConflicts(cardIndex) {
   if (!db || !CONTENT_ID) return;
   
-  const presenceRef = db.ref('presence/' + CONTENT_ID);
-  const myPresenceRef = presenceRef.child(localNickname || 'Anonymous-' + Date.now());
+  const versionsRef = db.ref('versions/' + CONTENT_ID + '/' + cardIndex);
+  const snapshot = await versionsRef.orderByChild('timestamp').limitToLast(5).once('value');
+  const versions = snapshot.val();
   
-  // Track my editing state
-  window.currentlyEditing = null;
+  if (!versions) return;
   
-  // When I start editing a card
-  document.addEventListener('focusin', (e) => {
-    const cardEl = e.target.closest('.card');
-    if (!cardEl) return;
-    const cardIndex = Array.from(document.querySelectorAll('.card')).indexOf(cardEl);
-    if (cardIndex >= 0) {
-      window.currentlyEditing = cardIndex;
-      myPresenceRef.set({ cardIndex, nickname: localNickname || 'Anonymous', timestamp: Date.now() });
-    }
-  });
+  const versionArray = Object.values(versions);
+  const now = Date.now();
+  const recentThreshold = 60000; // 1 minute
   
-  // When I stop editing
-  document.addEventListener('focusout', (e) => {
-    const cardEl = e.target.closest('.card');
-    if (cardEl) {
-      setTimeout(() => {
-        const stillEditing = document.activeElement?.closest('.card');
-        if (!stillEditing) {
-          window.currentlyEditing = null;
-          myPresenceRef.remove();
-        }
-      }, 100);
-    }
-  });
+  // Filter to recent versions
+  const recentVersions = versionArray.filter(v => now - v.timestamp < recentThreshold);
   
-  // Clean up on page unload
-  window.addEventListener('beforeunload', () => {
-    myPresenceRef.remove();
-  });
+  // Check if multiple authors edited recently
+  const authors = [...new Set(recentVersions.map(v => v.author))];
   
-  // Listen for others' presence
-  presenceRef.on('child_added', (snapshot) => {
-    const data = snapshot.val();
-    if (snapshot.key === (localNickname || 'Anonymous-' + Date.now())) return;  // Skip self
-    showRemoteCursor(data.cardIndex, data.nickname);
-  });
-  
-  presenceRef.on('child_changed', (snapshot) => {
-    const data = snapshot.val();
-    if (snapshot.key === (localNickname || 'Anonymous-' + Date.now())) return;
-    showRemoteCursor(data.cardIndex, data.nickname);
-  });
-  
-  presenceRef.on('child_removed', (snapshot) => {
-    const data = snapshot.val();
-    hideRemoteCursor(data.cardIndex);
-  });
+  if (authors.length > 1) {
+    // Conflict detected! Show version comparison UI
+    showConflictUI(cardIndex, recentVersions);
+  }
 }
 
-// Show remote user cursor/indicator on a card
-function showRemoteCursor(cardIndex, nickname) {
+// Show conflict resolution UI
+function showConflictUI(cardIndex, versions) {
   const cardElements = document.querySelectorAll('.card');
   if (!cardElements[cardIndex]) return;
   
   const cardEl = cardElements[cardIndex];
-  let cursor = cardEl.querySelector('.remote-cursor');
-  if (!cursor) {
-    cursor = document.createElement('div');
-    cursor.className = 'remote-cursor';
-    cursor.style.cssText = 'position:absolute;top:-4px;left:-4px;right:-4px;bottom:-4px;border:2px solid #8b5cf6;border-radius:12px;pointer-events:none;z-index:50;';
-    cardEl.style.position = 'relative';
-    cardEl.appendChild(cursor);
+  
+  // Check if conflict panel already exists
+  let conflictPanel = cardEl.querySelector('.conflict-panel');
+  if (conflictPanel) {
+    // Update existing panel
+    updateConflictPanel(conflictPanel, versions);
+    return;
   }
   
-  // Add/update label
-  let label = cardEl.querySelector('.remote-cursor-label');
-  if (!label) {
-    label = document.createElement('div');
-    label.className = 'remote-cursor-label';
-    label.style.cssText = 'position:absolute;top:-20px;left:8px;background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;z-index:51;';
-    cardEl.appendChild(label);
-  }
-  label.textContent = nickname;
+  // Create conflict panel
+  conflictPanel = document.createElement('div');
+  conflictPanel.className = 'conflict-panel';
+  conflictPanel.style.cssText = 'position:absolute;left:0;right:0;bottom:0;background:#1a1a2e;border-top:2px solid #f59e0b;padding:8px;z-index:100;max-height:150px;overflow-y:auto;border-radius:0 0 8px 8px;';
+  
+  updateConflictPanel(conflictPanel, versions);
+  
+  cardEl.style.position = 'relative';
+  cardEl.appendChild(conflictPanel);
+  
+  // Auto-hide after 30 seconds
+  setTimeout(() => {
+    if (conflictPanel.parentNode) {
+      conflictPanel.remove();
+    }
+  }, 30000);
 }
 
-// Hide remote cursor
-function hideRemoteCursor(cardIndex) {
-  const cardElements = document.querySelectorAll('.card');
-  if (!cardElements[cardIndex]) return;
+// Update conflict panel content
+function updateConflictPanel(panel, versions) {
+  // Sort by timestamp (newest first)
+  const sorted = [...versions].sort((a, b) => b.timestamp - a.timestamp);
   
-  const cardEl = cardElements[cardIndex];
-  const cursor = cardEl.querySelector('.remote-cursor');
-  const label = cardEl.querySelector('.remote-cursor-label');
-  if (cursor) cursor.remove();
-  if (label) label.remove();
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:11px;color:#f59e0b;font-weight:600;">⚠️ Multiple edits detected</span><button onclick="this.closest(\'.conflict-panel\').remove()" style="background:none;border:none;color:#888;cursor:pointer;font-size:14px;">✕</button></div>';
+  
+  sorted.slice(0, 3).forEach(version => {
+    const color = version.color || getAuthorColor(version.author);
+    const time = new Date(version.timestamp).toLocaleTimeString();
+    html += `
+      <div style="border-left:3px solid ${color};padding:4px 8px;margin:4px 0;background:#252525;border-radius:0 4px 4px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;color:${color};font-weight:600;">${version.author}</span>
+          <span style="font-size:9px;color:#666;">${time}</span>
+        </div>
+        <div style="font-size:11px;color:#ccc;margin-top:2px;max-height:40px;overflow:hidden;">${version.content.substring(0, 100)}${version.content.length > 100 ? '...' : ''}</div>
+        <button onclick="applyVersion(${panel.closest('.card') ? Array.from(document.querySelectorAll('.card')).indexOf(panel.closest('.card')) : 0}, '${btoa(unescape(encodeURIComponent(version.title)))}', '${btoa(unescape(encodeURIComponent(version.content)))}')" style="background:#4ade80;color:#1a1a1a;border:none;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;margin-top:4px;">Use this version</button>
+      </div>
+    `;
+  });
+  
+  panel.innerHTML = html;
+}
+
+// Apply a specific version
+function applyVersion(cardIndex, encodedTitle, encodedContent) {
+  const title = decodeURIComponent(escape(atob(encodedTitle)));
+  const content = decodeURIComponent(escape(atob(encodedContent)));
+  
+  // Update local data
+  if (cardsData[cardIndex]) {
+    cardsData[cardIndex].title = title;
+    cardsData[cardIndex].content = content;
+  }
+  
+  // Update DOM
+  const cardElements = document.querySelectorAll('.card');
+  if (cardElements[cardIndex]) {
+    const cardEl = cardElements[cardIndex];
+    const titleEl = cardEl.querySelector('.card-title');
+    const contentEl = cardEl.querySelector('.card-content');
+    if (titleEl) titleEl.innerHTML = renderContent(title);
+    if (contentEl) contentEl.innerHTML = renderContent(content);
+    
+    // Remove conflict panel
+    const conflictPanel = cardEl.querySelector('.conflict-panel');
+    if (conflictPanel) conflictPanel.remove();
+  }
+  
+  // Save this as the new version
+  if (cardsRef) {
+    cardsRef.child(cardIndex.toString()).set({
+      title: title,
+      content: content,
+      updatedBy: localNickname || 'Anonymous',
+      updatedAt: Date.now()
+    });
+  }
+  
+  showToast('✅ Version applied');
 }
 
 // Enable inline editing for all cards (Google Docs style)
@@ -3442,6 +3475,35 @@ async function submitEdit() {
   // FULL PERMISSION MODE: Save directly and sync to all viewers
   if (FULL_PERMISSION) {
     try {
+      const editerId = localNickname || 'Anonymous';
+      const timestamp = Date.now();
+      
+      // Instead of overwriting, add this version as a new entry
+      // The card will show all recent versions color-coded
+      if (cardsRef) {
+        // Save to versions history for this card
+        const versionsRef = db.ref('versions/' + CONTENT_ID + '/' + currentEditCardIndex);
+        
+        // Push new version
+        await versionsRef.push({
+          title: newTitle,
+          content: newContent,
+          author: editerId,
+          color: getAuthorColor(editerId),
+          timestamp: timestamp
+        });
+        
+        // Also update the main card data (latest wins for display)
+        await cardsRef.child(currentEditCardIndex.toString()).set({
+          title: newTitle,
+          content: newContent,
+          updatedBy: editerId,
+          updatedAt: timestamp
+        });
+        
+        console.log('[EditSystem] Version saved to Firebase');
+      }
+      
       // Update local cardsData
       cardsData[currentEditCardIndex].title = newTitle;
       cardsData[currentEditCardIndex].content = newContent;
@@ -3454,17 +3516,6 @@ async function submitEdit() {
         const contentEl = cardEl.querySelector('.card-content');
         if (titleEl) titleEl.innerHTML = renderContent(newTitle);
         if (contentEl) contentEl.innerHTML = renderContent(newContent);
-      }
-      
-      // Sync to Firebase for other viewers
-      if (cardsRef) {
-        await cardsRef.child(currentEditCardIndex.toString()).set({
-          title: newTitle,
-          content: newContent,
-          updatedBy: localNickname || 'Anonymous',
-          updatedAt: Date.now()
-        });
-        console.log('[EditSystem] Card synced to Firebase');
       }
       
       showToast('✅ Card updated successfully!');
