@@ -1551,6 +1551,7 @@ body.fullscreen .lesson-info{margin-bottom:1rem;padding:1.5rem}
     </p>
     <div class="controls-bar">
       <button class="btn-primary" onclick="startSlideshow()">▶ Start Slideshow</button>
+      <button class="control-btn add-card-btn" onclick="addNewCard()" title="Add a new card" style="background:#22c55e;color:#1a1a1a;">➕ Add Card</button>
       <button class="control-btn" onclick="shuffleCards()" title="Shuffle cards for random study">🔀 Shuffle</button>
       <button class="control-btn" onclick="expandAll()" title="Expand all cards">📖 Expand All</button>
       <button class="control-btn" id="bookmarkFilter" onclick="toggleBookmarkFilter()" title="Show bookmarked only">⭐ Bookmarked (<span id="bookmarkCount">0</span>)</button>
@@ -1562,131 +1563,131 @@ body.fullscreen .lesson-info{margin-bottom:1rem;padding:1.5rem}
     </div>
   </div>
   <div class="cards-grid" id="cards">
-    <div class="card" onclick="toggleCard(this)" data-index="0" data-title="board setup" data-content="&lt;p&gt;&lt;img class=&quot;card-image&quot; src=&quot;data:image/png;base64,ivborw0kggoaaaansuheugaaaqkaaaj6cayaaaaljntgaaaaaxnsr0iars4c6qaaaarnqu1baacxjwv8yquaaaajcehzcwaadsmaaa7dacdvqgqaap+lsurbvhhe7p15sg1blt6frxp75t3x5g">
+    <div class="card" onclick="toggleCard(this, event)" data-index="0" data-title="board setup" data-content="&lt;p&gt;&lt;img class=&quot;card-image&quot; src=&quot;data:image/png;base64,ivborw0kggoaaaansuheugaaaqkaaaj6cayaaaaljntgaaaaaxnsr0iars4c6qaaaarnqu1baacxjwv8yquaaaajcehzcwaadsmaaa7dacdvqgqaap+lsurbvhhe7p15sg1blt6frxp75t3x5g">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">1</span>
         <span class="card-title">Board Setup</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(0)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-0"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="1" data-title="core ideas" data-content="&lt;ul&gt;&lt;li&gt;&lt;p&gt;core idea: win by escorting your king to k6 or k5 and keeping him safe for 3 rounds&amp;nbsp;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&amp;nbsp;another win condition is to checkmate- you have 15 pawns and 1 king (names are">
+    <div class="card" onclick="toggleCard(this, event)" data-index="1" data-title="core ideas" data-content="&lt;ul&gt;&lt;li&gt;&lt;p&gt;core idea: win by escorting your king to k6 or k5 and keeping him safe for 3 rounds&amp;nbsp;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&amp;nbsp;another win condition is to checkmate- you have 15 pawns and 1 king (names are">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">2</span>
         <span class="card-title">Core ideas</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(1)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-1"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="2" data-title="hero classes" data-content="&lt;p&gt;there are 4 classes of heroes:&lt;br&gt;&lt;/p&gt;&lt;p&gt;strikers: they are aggressive heroes&lt;/p&gt;&lt;p&gt;disruptors: they disrupt enemy plans by debuffing them&lt;/p&gt;&lt;p&gt;shapers: they shape the battlefield by introducing z">
+    <div class="card" onclick="toggleCard(this, event)" data-index="2" data-title="hero classes" data-content="&lt;p&gt;there are 4 classes of heroes:&lt;br&gt;&lt;/p&gt;&lt;p&gt;strikers: they are aggressive heroes&lt;/p&gt;&lt;p&gt;disruptors: they disrupt enemy plans by debuffing them&lt;/p&gt;&lt;p&gt;shapers: they shape the battlefield by introducing z">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">3</span>
         <span class="card-title">Hero Classes</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(2)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-2"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="3" data-title="what do heroes do?" data-content="&lt;p&gt;# test&lt;/p&gt;&lt;p&gt;heroes on their own don&#39;t do much other than having upgraded movement over basic pawns.&lt;/p&gt;&lt;p&gt;they provide some effects.&lt;/p&gt;&lt;p&gt;they work best with ability cards, for example a fireball">
+    <div class="card" onclick="toggleCard(this, event)" data-index="3" data-title="what do heroes do?" data-content="&lt;p&gt;# test&lt;/p&gt;&lt;p&gt;heroes on their own don&#39;t do much other than having upgraded movement over basic pawns.&lt;/p&gt;&lt;p&gt;they provide some effects.&lt;/p&gt;&lt;p&gt;they work best with ability cards, for example a fireball">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">4</span>
         <span class="card-title">What do heroes do?</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(3)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-3"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="4" data-title="market and economy" data-content="&lt;p&gt;- you gain +3 gold every turn you have a piece/hero on h5 or h6. if you are occupying both squares, you get +6 every turn.&lt;/p&gt;&lt;p&gt;- each card in the games has 3 different prices: the first is the ba">
+    <div class="card" onclick="toggleCard(this, event)" data-index="4" data-title="market and economy" data-content="&lt;p&gt;- you gain +3 gold every turn you have a piece/hero on h5 or h6. if you are occupying both squares, you get +6 every turn.&lt;/p&gt;&lt;p&gt;- each card in the games has 3 different prices: the first is the ba">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">5</span>
         <span class="card-title">Market and Economy</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(4)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-4"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="5" data-title="interaction between pieces, heroes, and abilities." data-content="&lt;p&gt;&lt;/p&gt;&lt;p&gt;a hero can be immediately captured by a pawn or a hero. but cannot be immediately captured by an ability such as fireball. offensive abilities have atk and def, other abilities have def or h">
+    <div class="card" onclick="toggleCard(this, event)" data-index="5" data-title="interaction between pieces, heroes, and abilities." data-content="&lt;p&gt;&lt;/p&gt;&lt;p&gt;a hero can be immediately captured by a pawn or a hero. but cannot be immediately captured by an ability such as fireball. offensive abilities have atk and def, other abilities have def or h">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">6</span>
         <span class="card-title">Interaction between pieces, heroes, and abilities.</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(5)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-5"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="6" data-title="phases" data-content="&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;h1&gt;terstest&lt;/h1&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;jkjlkj&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;decide who moves first in whatever fashion you like.&amp;nbsp;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;drawing phase:&lt;/p&gt;&lt;p&gt;- both players dr">
+    <div class="card" onclick="toggleCard(this, event)" data-index="6" data-title="phases" data-content="&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;h1&gt;terstest&lt;/h1&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;jkjlkj&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;decide who moves first in whatever fashion you like.&amp;nbsp;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;drawing phase:&lt;/p&gt;&lt;p&gt;- both players dr">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">7</span>
         <span class="card-title">Phases</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(6)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-6"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="7" data-title="untitled card" data-content="&lt;p&gt;&lt;/p&gt;">
+    <div class="card" onclick="toggleCard(this, event)" data-index="7" data-title="untitled card" data-content="&lt;p&gt;&lt;/p&gt;">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">8</span>
         <span class="card-title">Untitled Card</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(7)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-7"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="8" data-title="untitled card" data-content="&lt;p&gt;&lt;/p&gt;">
+    <div class="card" onclick="toggleCard(this, event)" data-index="8" data-title="untitled card" data-content="&lt;p&gt;&lt;/p&gt;">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">9</span>
         <span class="card-title">Untitled Card</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(8)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-8"></div>
       <div class="click-hint">Click to expand</div>
     </div>
-    <div class="card" onclick="toggleCard(this)" data-index="9" data-title="untitled card" data-content="">
+    <div class="card" onclick="toggleCard(this, event)" data-index="9" data-title="untitled card" data-content="">
       <div class="drag-handle">⋮⋮</div>
       <div class="card-header">
         <span class="card-num">10</span>
         <span class="card-title">Untitled Card</span>
         <button class="edit-btn" onclick="event.stopPropagation();openEditModal(9)" title="Suggest an edit">✏️</button>
         <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
-        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode)">▼</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
       </div>
       <div class="resize-handle"></div>
       <div class="card-content" id="content-9"></div>
@@ -1847,13 +1848,111 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProgress();
 });
 
-function toggleCard(card) {
+function toggleCard(card, e) {
+  // Don't toggle if clicking on editable content in full permission mode
+  if (e && FULL_PERMISSION) {
+    const target = e.target;
+    if (target.closest('.card-title') || target.closest('.card-content')) {
+      // Check if these elements are contenteditable
+      const editableElement = target.closest('[contenteditable="true"]');
+      if (editableElement) {
+        e.stopPropagation();
+        return;
+      }
+    }
+  }
+  
   const wasExpanded = card.classList.contains('expanded');
   card.classList.toggle('expanded');
   
   // Re-render math when expanding (in case it wasn't visible before)
   if (!wasExpanded) {
     setTimeout(renderMathInDocument, 50);
+  }
+  
+  updateProgress();
+}
+
+// Add a new card (only in full permission mode)
+async function addNewCard() {
+  if (!FULL_PERMISSION) {
+    showToast('❌ Adding cards requires full editor access');
+    return;
+  }
+  
+  const newCardIndex = cardsData.length;
+  const newCard = {
+    title: 'New Card',
+    content: 'Click to edit...',
+    type: 'text'
+  };
+  
+  // Add to local data
+  cardsData.push(newCard);
+  
+  // Create card HTML
+  const container = document.getElementById('cards');
+  const cardHtml = `
+    <div class="card expanded" onclick="toggleCard(this, event)" data-index="${newCardIndex}" data-title="new card" data-content="click to edit">
+      <div class="drag-handle">⋮⋮</div>
+      <div class="card-header">
+        <span class="card-num">${newCardIndex + 1}</span>
+        <span class="card-title">New Card</span>
+        <button class="edit-btn" onclick="event.stopPropagation();openEditModal(${newCardIndex})" title="Edit this card">✏️</button>
+        <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="card-content" id="content-${newCardIndex}">Click to edit...</div>
+      <div class="click-hint">Click to expand</div>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', cardHtml);
+  
+  // Enable inline editing on the new card
+  const cardEl = container.lastElementChild;
+  const titleEl = cardEl.querySelector('.card-title');
+  const contentEl = cardEl.querySelector('.card-content');
+  
+  if (titleEl) {
+    titleEl.setAttribute('contenteditable', 'true');
+    titleEl.style.cursor = 'text';
+    titleEl.style.outline = 'none';
+  }
+  if (contentEl) {
+    contentEl.setAttribute('contenteditable', 'true');
+    contentEl.style.cursor = 'text';
+    contentEl.style.outline = 'none';
+  }
+  
+  // Sync to Firebase
+  if (cardsRef) {
+    try {
+      await cardsRef.child(newCardIndex.toString()).set({
+        title: newCard.title,
+        content: newCard.content,
+        updatedBy: localNickname || 'Anonymous',
+        updatedAt: Date.now()
+      });
+      showToast('✅ New card added!');
+    } catch (err) {
+      console.error('[AddCard] Error syncing new card:', err);
+      showToast('⚠️ Card added locally (sync failed)');
+    }
+  }
+  
+  // Scroll to the new card
+  cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  
+  // Focus on title for immediate editing
+  if (titleEl) {
+    titleEl.focus();
+    // Select all text for easy replacement
+    const range = document.createRange();
+    range.selectNodeContents(titleEl);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
   }
   
   updateProgress();
@@ -3231,6 +3330,70 @@ function initEditSystem() {
         }
         
         console.log('[EditSystem] Card ' + cardIndex + ' updated by ' + data.updatedBy);
+      }
+    });
+    
+    // Listen for NEW cards added by other users
+    cardsRef.on('child_added', (snapshot) => {
+      const cardIndex = parseInt(snapshot.key);
+      const data = snapshot.val();
+      if (isNaN(cardIndex) || !data) return;
+      
+      // Only add if this is a truly new card (index beyond our current cards)
+      if (cardIndex >= cardsData.length) {
+        console.log('[EditSystem] New card detected:', cardIndex, data);
+        
+        // Add to local data
+        cardsData[cardIndex] = {
+          title: data.title || 'New Card',
+          content: data.content || '',
+          type: 'text'
+        };
+        
+        // Create card in DOM
+        const container = document.getElementById('cards');
+        const cardHtml = `
+          <div class="card expanded" onclick="toggleCard(this, event)" data-index="${cardIndex}" data-title="${(data.title || '').toLowerCase()}" data-content="${(data.content || '').substring(0, 200).toLowerCase()}">
+            <div class="drag-handle">⋮⋮</div>
+            <div class="card-header">
+              <span class="card-num">${cardIndex + 1}</span>
+              <span class="card-title">${data.title || 'Card ' + (cardIndex + 1)}</span>
+              <button class="edit-btn" onclick="event.stopPropagation();openEditModal(${cardIndex})" title="Edit this card">✏️</button>
+              <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
+              <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
+            </div>
+            <div class="resize-handle"></div>
+            <div class="card-content" id="content-${cardIndex}">${renderContent(data.content || '')}</div>
+            <div class="click-hint">Click to expand</div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+        
+        // Enable inline editing on the new card
+        const cardEl = container.lastElementChild;
+        const titleEl = cardEl.querySelector('.card-title');
+        const contentEl = cardEl.querySelector('.card-content');
+        
+        if (titleEl) {
+          titleEl.setAttribute('contenteditable', 'true');
+          titleEl.style.cursor = 'text';
+          titleEl.style.outline = 'none';
+        }
+        if (contentEl) {
+          contentEl.setAttribute('contenteditable', 'true');
+          contentEl.style.cursor = 'text';
+          contentEl.style.outline = 'none';
+        }
+        
+        // Visual feedback
+        cardEl.style.boxShadow = '0 0 20px #22c55e';
+        setTimeout(() => { cardEl.style.boxShadow = ''; }, 2000);
+        
+        if (data.updatedBy) {
+          showToast('➕ New card added by ' + data.updatedBy);
+        }
+        
+        updateProgress();
       }
     });
     
