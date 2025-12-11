@@ -651,6 +651,11 @@ kbd{
   0%,100%{transform:scale(1)}
   50%{transform:scale(1.1)}
 }
+@keyframes fadeOut{
+  0%{opacity:1}
+  70%{opacity:1}
+  100%{opacity:0}
+}
 .chat-panel{
   display:none;
   flex-direction:column;
@@ -3053,6 +3058,7 @@ function stripHtml(html) {
 // Allows visitors to suggest edits that the owner can accept/reject
 
 let currentEditCardIndex = null;
+let saveDebounceTimers = {};  // Track debounce timers per card
 
 function initEditSystem() {
   if (!FIREBASE_URL || !OWNER_ID || !CONTENT_ID) {
@@ -3070,10 +3076,37 @@ function initEditSystem() {
   editRef = db.ref('edits/' + CONTENT_ID);
   console.log('[EditSystem] Initialized with ref:', 'edits/' + CONTENT_ID);
   
-  // For full permission mode, set up real-time card sync
+  // For full permission mode, set up real-time card sync and inline editing
   if (FULL_PERMISSION) {
     cardsRef = db.ref('cards/' + CONTENT_ID);
-    console.log('[EditSystem] Full permission mode - listening for card updates');
+    console.log('[EditSystem] Full permission mode - setting up collaborative editing');
+    
+    // Load saved card data from Firebase (for persistence)
+    cardsRef.once('value', (snapshot) => {
+      const savedCards = snapshot.val();
+      if (savedCards) {
+        console.log('[EditSystem] Loading saved cards from Firebase');
+        Object.keys(savedCards).forEach(key => {
+          const idx = parseInt(key);
+          if (!isNaN(idx) && cardsData[idx] && savedCards[key]) {
+            cardsData[idx].title = savedCards[key].title || cardsData[idx].title;
+            cardsData[idx].content = savedCards[key].content || cardsData[idx].content;
+          }
+        });
+        // Re-render all cards with loaded data
+        const cardElements = document.querySelectorAll('.card');
+        cardElements.forEach((cardEl, idx) => {
+          if (cardsData[idx]) {
+            const titleEl = cardEl.querySelector('.card-title');
+            const contentEl = cardEl.querySelector('.card-content');
+            if (titleEl) titleEl.innerHTML = renderContent(cardsData[idx].title);
+            if (contentEl) contentEl.innerHTML = renderContent(cardsData[idx].content);
+          }
+        });
+      }
+      // Enable inline editing after data is loaded
+      enableInlineEditing();
+    });
     
     // Listen for card changes from other users
     cardsRef.on('child_changed', (snapshot) => {
@@ -3086,19 +3119,245 @@ function initEditSystem() {
         cardsData[cardIndex].title = data.title;
         cardsData[cardIndex].content = data.content;
         
-        // Update DOM
+        // Update DOM - always show latest from Firebase
         const cardElements = document.querySelectorAll('.card');
         if (cardElements[cardIndex]) {
           const cardEl = cardElements[cardIndex];
           const titleEl = cardEl.querySelector('.card-title');
           const contentEl = cardEl.querySelector('.card-content');
-          if (titleEl) titleEl.innerHTML = renderContent(data.title);
-          if (contentEl) contentEl.innerHTML = renderContent(data.content);
+          
+          // Only skip update if this card is currently focused (user is typing)
+          const isFocused = document.activeElement === titleEl || document.activeElement === contentEl;
+          
+          if (!isFocused) {
+            // Show flash effect for remote update
+            cardEl.style.boxShadow = '0 0 10px #4ade80';
+            setTimeout(() => { cardEl.style.boxShadow = ''; }, 500);
+            
+            if (titleEl && titleEl.innerText !== data.title) {
+              titleEl.innerText = data.title;
+            }
+            if (contentEl && contentEl.innerText !== data.content) {
+              contentEl.innerText = data.content;
+            }
+          } else {
+            // Show indicator that someone else edited
+            showRemoteEditBadge(cardEl, data.updatedBy);
+          }
         }
         
         console.log('[EditSystem] Card ' + cardIndex + ' updated by ' + data.updatedBy);
       }
     });
+    
+    // Track who is currently editing and show cursors
+    setupPresenceTracking();
+  }
+}
+
+// Show a badge when remote user edits while you're editing
+function showRemoteEditBadge(cardEl, editor) {
+  let badge = cardEl.querySelector('.remote-edit-badge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.className = 'remote-edit-badge';
+    badge.style.cssText = 'position:absolute;top:-8px;right:-8px;background:#f59e0b;color:#1a1a1a;padding:4px 8px;border-radius:12px;font-size:11px;font-weight:600;z-index:100;animation:pulse 0.5s;';
+    cardEl.style.position = 'relative';
+    cardEl.appendChild(badge);
+  }
+  badge.textContent = '📝 ' + editor + ' editing...';
+  
+  // Remove after 3 seconds
+  clearTimeout(badge._timeout);
+  badge._timeout = setTimeout(() => badge.remove(), 3000);
+}
+
+// Setup presence tracking to show who is editing which card
+function setupPresenceTracking() {
+  if (!db || !CONTENT_ID) return;
+  
+  const presenceRef = db.ref('presence/' + CONTENT_ID);
+  const myPresenceRef = presenceRef.child(localNickname || 'Anonymous-' + Date.now());
+  
+  // Track my editing state
+  window.currentlyEditing = null;
+  
+  // When I start editing a card
+  document.addEventListener('focusin', (e) => {
+    const cardEl = e.target.closest('.card');
+    if (!cardEl) return;
+    const cardIndex = Array.from(document.querySelectorAll('.card')).indexOf(cardEl);
+    if (cardIndex >= 0) {
+      window.currentlyEditing = cardIndex;
+      myPresenceRef.set({ cardIndex, nickname: localNickname || 'Anonymous', timestamp: Date.now() });
+    }
+  });
+  
+  // When I stop editing
+  document.addEventListener('focusout', (e) => {
+    const cardEl = e.target.closest('.card');
+    if (cardEl) {
+      setTimeout(() => {
+        const stillEditing = document.activeElement?.closest('.card');
+        if (!stillEditing) {
+          window.currentlyEditing = null;
+          myPresenceRef.remove();
+        }
+      }, 100);
+    }
+  });
+  
+  // Clean up on page unload
+  window.addEventListener('beforeunload', () => {
+    myPresenceRef.remove();
+  });
+  
+  // Listen for others' presence
+  presenceRef.on('child_added', (snapshot) => {
+    const data = snapshot.val();
+    if (snapshot.key === (localNickname || 'Anonymous-' + Date.now())) return;  // Skip self
+    showRemoteCursor(data.cardIndex, data.nickname);
+  });
+  
+  presenceRef.on('child_changed', (snapshot) => {
+    const data = snapshot.val();
+    if (snapshot.key === (localNickname || 'Anonymous-' + Date.now())) return;
+    showRemoteCursor(data.cardIndex, data.nickname);
+  });
+  
+  presenceRef.on('child_removed', (snapshot) => {
+    const data = snapshot.val();
+    hideRemoteCursor(data.cardIndex);
+  });
+}
+
+// Show remote user cursor/indicator on a card
+function showRemoteCursor(cardIndex, nickname) {
+  const cardElements = document.querySelectorAll('.card');
+  if (!cardElements[cardIndex]) return;
+  
+  const cardEl = cardElements[cardIndex];
+  let cursor = cardEl.querySelector('.remote-cursor');
+  if (!cursor) {
+    cursor = document.createElement('div');
+    cursor.className = 'remote-cursor';
+    cursor.style.cssText = 'position:absolute;top:-4px;left:-4px;right:-4px;bottom:-4px;border:2px solid #8b5cf6;border-radius:12px;pointer-events:none;z-index:50;';
+    cardEl.style.position = 'relative';
+    cardEl.appendChild(cursor);
+  }
+  
+  // Add/update label
+  let label = cardEl.querySelector('.remote-cursor-label');
+  if (!label) {
+    label = document.createElement('div');
+    label.className = 'remote-cursor-label';
+    label.style.cssText = 'position:absolute;top:-20px;left:8px;background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;z-index:51;';
+    cardEl.appendChild(label);
+  }
+  label.textContent = nickname;
+}
+
+// Hide remote cursor
+function hideRemoteCursor(cardIndex) {
+  const cardElements = document.querySelectorAll('.card');
+  if (!cardElements[cardIndex]) return;
+  
+  const cardEl = cardElements[cardIndex];
+  const cursor = cardEl.querySelector('.remote-cursor');
+  const label = cardEl.querySelector('.remote-cursor-label');
+  if (cursor) cursor.remove();
+  if (label) label.remove();
+}
+
+// Enable inline editing for all cards (Google Docs style)
+function enableInlineEditing() {
+  const cardElements = document.querySelectorAll('.card');
+  
+  cardElements.forEach((cardEl, cardIndex) => {
+    const titleEl = cardEl.querySelector('.card-title');
+    const contentEl = cardEl.querySelector('.card-content');
+    
+    // Make title and content editable
+    if (titleEl) {
+      titleEl.setAttribute('contenteditable', 'true');
+      titleEl.style.cursor = 'text';
+      titleEl.style.outline = 'none';
+      titleEl.style.borderBottom = '1px dashed transparent';
+      titleEl.addEventListener('focus', () => {
+        titleEl.style.borderBottom = '1px dashed #4ade80';
+      });
+      titleEl.addEventListener('blur', () => {
+        titleEl.style.borderBottom = '1px dashed transparent';
+      });
+      titleEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
+    }
+    
+    if (contentEl) {
+      contentEl.setAttribute('contenteditable', 'true');
+      contentEl.style.cursor = 'text';
+      contentEl.style.outline = 'none';
+      contentEl.style.border = '1px dashed transparent';
+      contentEl.style.borderRadius = '4px';
+      contentEl.style.padding = '4px';
+      contentEl.style.minHeight = '50px';
+      contentEl.addEventListener('focus', () => {
+        contentEl.style.border = '1px dashed #4ade80';
+      });
+      contentEl.addEventListener('blur', () => {
+        contentEl.style.border = '1px dashed transparent';
+      });
+      contentEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
+    }
+    
+    // Hide the edit button since we're doing inline editing
+    const editBtn = cardEl.querySelector('.edit-btn');
+    if (editBtn) editBtn.style.display = 'none';
+  });
+  
+  console.log('[EditSystem] Inline editing enabled for all cards');
+}
+
+// Debounce save to prevent too many Firebase writes
+function debounceSaveCard(cardIndex, titleEl, contentEl) {
+  // Clear existing timer for this card
+  if (saveDebounceTimers[cardIndex]) {
+    clearTimeout(saveDebounceTimers[cardIndex]);
+  }
+  
+  // Set new timer
+  saveDebounceTimers[cardIndex] = setTimeout(() => {
+    saveCardToFirebase(cardIndex, titleEl, contentEl);
+  }, 500);  // Save 500ms after user stops typing
+}
+
+// Save card content to Firebase
+async function saveCardToFirebase(cardIndex, titleEl, contentEl) {
+  if (!cardsRef) return;
+  
+  const newTitle = titleEl ? titleEl.innerText.trim() : '';
+  const newContent = contentEl ? contentEl.innerText.trim() : '';
+  
+  // Update local data
+  if (cardsData[cardIndex]) {
+    cardsData[cardIndex].title = newTitle;
+    cardsData[cardIndex].content = newContent;
+  }
+  
+  try {
+    await cardsRef.child(cardIndex.toString()).set({
+      title: newTitle,
+      content: newContent,
+      updatedBy: localNickname || 'Anonymous',
+      updatedAt: Date.now()
+    });
+    // Small visual feedback
+    const indicator = document.createElement('span');
+    indicator.innerHTML = '✓';
+    indicator.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#22c55e;color:white;padding:8px 16px;border-radius:8px;font-size:14px;z-index:10000;animation:fadeOut 1s forwards;';
+    document.body.appendChild(indicator);
+    setTimeout(() => indicator.remove(), 1000);
+  } catch (err) {
+    console.error('[EditSystem] Error saving card:', err);
   }
 }
 
