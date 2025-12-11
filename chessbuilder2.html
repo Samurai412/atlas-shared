@@ -3304,27 +3304,35 @@ function initEditSystem() {
           const isEditingTitle = document.activeElement === titleEl;
           const isEditingContent = document.activeElement === contentEl;
           
-          // Save cursor position before updating
-          let savedSelection = null;
+          // Check if content already matches (our own update echoing back)
+          const currentTitle = titleEl ? titleEl.innerText.trim() : '';
+          const currentContent = contentEl ? contentEl.innerText.trim() : '';
+          const titleMatches = currentTitle === (data.title || '').trim();
+          const contentMatches = currentContent === (data.content || '').trim();
+          
+          // Skip update if we're editing and content matches (our own update)
+          if ((isEditingTitle || isEditingContent) && titleMatches && contentMatches) {
+            console.log('[EditSystem] Skipping echo update for card', cardIndex);
+            return;
+          }
+          
+          // If we're editing but content differs, it's a remote change - show but preserve cursor
           if (isEditingTitle || isEditingContent) {
-            savedSelection = saveCursorPosition(isEditingTitle ? titleEl : contentEl);
+            // Show notification instead of overwriting
+            showToast('⚠️ Card ' + (cardIndex + 1) + ' updated by ' + data.updatedBy + ' - click outside to see changes');
+            return;
           }
           
           // Visual feedback for remote update
           cardEl.style.boxShadow = '0 0 15px #4ade80';
           setTimeout(() => { cardEl.style.boxShadow = ''; }, 1000);
           
-          // Update content (use innerText to preserve editability)
-          if (titleEl) titleEl.innerText = data.title;
-          if (contentEl) contentEl.innerText = data.content;
+          // Update content (not editing, safe to update)
+          if (titleEl && !titleMatches) titleEl.innerText = data.title;
+          if (contentEl && !contentMatches) contentEl.innerText = data.content;
           
-          // Restore cursor position if we were editing
-          if (savedSelection) {
-            restoreCursorPosition(isEditingTitle ? titleEl : contentEl, savedSelection);
-          }
-          
-          // Show toast notification (only if not currently editing this card)
-          if (data.updatedBy && !isEditingTitle && !isEditingContent) {
+          // Show toast notification
+          if (data.updatedBy) {
             showToast('📝 Card updated by ' + data.updatedBy);
           }
         }
