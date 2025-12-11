@@ -3060,6 +3060,81 @@ function stripHtml(html) {
 let currentEditCardIndex = null;
 let saveDebounceTimers = {};  // Track debounce timers per card
 
+// Save cursor position in a contenteditable element
+function saveCursorPosition(el) {
+  const selection = window.getSelection();
+  if (!selection.rangeCount) return null;
+  
+  const range = selection.getRangeAt(0);
+  const preCaretRange = range.cloneRange();
+  preCaretRange.selectNodeContents(el);
+  preCaretRange.setEnd(range.startContainer, range.startOffset);
+  
+  return {
+    start: preCaretRange.toString().length,
+    end: preCaretRange.toString().length + range.toString().length
+  };
+}
+
+// Restore cursor position in a contenteditable element
+function restoreCursorPosition(el, savedPosition) {
+  if (!savedPosition) return;
+  
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  
+  const range = document.createRange();
+  let charCount = 0;
+  let startNode = null, startOffset = 0;
+  let endNode = null, endOffset = 0;
+  
+  function traverseNodes(node) {
+    if (startNode && endNode) return;
+    
+    if (node.nodeType === Node.TEXT_NODE) {
+      const nextCharCount = charCount + node.length;
+      
+      if (!startNode && savedPosition.start >= charCount && savedPosition.start <= nextCharCount) {
+        startNode = node;
+        startOffset = savedPosition.start - charCount;
+      }
+      if (!endNode && savedPosition.end >= charCount && savedPosition.end <= nextCharCount) {
+        endNode = node;
+        endOffset = savedPosition.end - charCount;
+      }
+      
+      charCount = nextCharCount;
+    } else {
+      for (let i = 0; i < node.childNodes.length; i++) {
+        traverseNodes(node.childNodes[i]);
+      }
+    }
+  }
+  
+  traverseNodes(el);
+  
+  // Set to end if not found
+  if (!startNode) {
+    startNode = el;
+    startOffset = el.childNodes.length;
+  }
+  if (!endNode) {
+    endNode = startNode;
+    endOffset = startOffset;
+  }
+  
+  try {
+    range.setStart(startNode, startOffset);
+    range.setEnd(endNode, endOffset);
+    selection.addRange(range);
+  } catch (e) {
+    // If position restoration fails, just place cursor at end
+    range.selectNodeContents(el);
+    range.collapse(false);
+    selection.addRange(range);
+  }
+}
+
 function initEditSystem() {
   if (!FIREBASE_URL || !OWNER_ID || !CONTENT_ID) {
     console.log('[EditSystem] Not initialized - missing config:', { FIREBASE_URL: !!FIREBASE_URL, OWNER_ID: !!OWNER_ID, CONTENT_ID: !!CONTENT_ID });
@@ -3114,12 +3189,6 @@ function initEditSystem() {
       const data = snapshot.val();
       if (isNaN(cardIndex) || !data) return;
       
-      // Skip DOM updates for the card we're currently editing
-      if (window.currentlyEditingCard === cardIndex) {
-        console.log('[EditSystem] Skipping update for card being edited:', cardIndex);
-        return;
-      }
-      
       // Update local data
       if (cardsData[cardIndex]) {
         cardsData[cardIndex].title = data.title;
@@ -3132,15 +3201,31 @@ function initEditSystem() {
           const titleEl = cardEl.querySelector('.card-title');
           const contentEl = cardEl.querySelector('.card-content');
           
+          // Check if we're editing this card
+          const isEditingTitle = document.activeElement === titleEl;
+          const isEditingContent = document.activeElement === contentEl;
+          
+          // Save cursor position before updating
+          let savedSelection = null;
+          if (isEditingTitle || isEditingContent) {
+            savedSelection = saveCursorPosition(isEditingTitle ? titleEl : contentEl);
+          }
+          
           // Visual feedback for remote update
           cardEl.style.boxShadow = '0 0 15px #4ade80';
           setTimeout(() => { cardEl.style.boxShadow = ''; }, 1000);
           
-          if (titleEl) titleEl.innerHTML = renderContent(data.title);
-          if (contentEl) contentEl.innerHTML = renderContent(data.content);
+          // Update content (use innerText to preserve editability)
+          if (titleEl) titleEl.innerText = data.title;
+          if (contentEl) contentEl.innerText = data.content;
           
-          // Show toast notification
-          if (data.updatedBy) {
+          // Restore cursor position if we were editing
+          if (savedSelection) {
+            restoreCursorPosition(isEditingTitle ? titleEl : contentEl, savedSelection);
+          }
+          
+          // Show toast notification (only if not currently editing this card)
+          if (data.updatedBy && !isEditingTitle && !isEditingContent) {
             showToast('📝 Card updated by ' + data.updatedBy);
           }
         }
