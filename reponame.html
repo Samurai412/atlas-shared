@@ -3119,72 +3119,194 @@ function initEditSystem() {
         cardsData[cardIndex].title = data.title;
         cardsData[cardIndex].content = data.content;
         
-        // Only update DOM if this user isn't currently editing this card
+        // Update DOM - show latest version
         const cardElements = document.querySelectorAll('.card');
         if (cardElements[cardIndex]) {
           const cardEl = cardElements[cardIndex];
           const titleEl = cardEl.querySelector('.card-title');
           const contentEl = cardEl.querySelector('.card-content');
           
-          // Check if this card is being edited locally
-          if (document.activeElement !== titleEl && document.activeElement !== contentEl) {
-            if (titleEl) titleEl.innerHTML = renderContent(data.title);
-            if (contentEl) contentEl.innerHTML = renderContent(data.content);
+          // Visual feedback for remote update
+          cardEl.style.boxShadow = '0 0 15px #4ade80';
+          setTimeout(() => { cardEl.style.boxShadow = ''; }, 1000);
+          
+          if (titleEl) titleEl.innerHTML = renderContent(data.title);
+          if (contentEl) contentEl.innerHTML = renderContent(data.content);
+          
+          // Show toast notification
+          if (data.updatedBy) {
+            showToast('📝 Card updated by ' + data.updatedBy);
           }
         }
         
         console.log('[EditSystem] Card ' + cardIndex + ' updated by ' + data.updatedBy);
       }
     });
+    
+    // Listen for version history to show conflicts
+    const versionsRef = db.ref('versions/' + CONTENT_ID);
+    versionsRef.on('child_added', handleVersionAdded);
+    versionsRef.on('child_changed', handleVersionChanged);
   }
 }
 
-// Enable inline editing for all cards (Google Docs style)
-function enableInlineEditing() {
-  const cardElements = document.querySelectorAll('.card');
+// Color palette for different authors
+const authorColors = {};
+const colorPalette = ['#f87171', '#fb923c', '#facc15', '#4ade80', '#22d3ee', '#818cf8', '#e879f9', '#f472b6'];
+let colorIndex = 0;
+
+function getAuthorColor(author) {
+  if (!authorColors[author]) {
+    authorColors[author] = colorPalette[colorIndex % colorPalette.length];
+    colorIndex++;
+  }
+  return authorColors[author];
+}
+
+// Handle new version being added
+function handleVersionAdded(snapshot) {
+  const cardIndex = parseInt(snapshot.key);
+  if (isNaN(cardIndex)) return;
   
-  cardElements.forEach((cardEl, cardIndex) => {
-    const titleEl = cardEl.querySelector('.card-title');
-    const contentEl = cardEl.querySelector('.card-content');
-    
-    // Make title and content editable
-    if (titleEl) {
-      titleEl.setAttribute('contenteditable', 'true');
-      titleEl.style.cursor = 'text';
-      titleEl.style.outline = 'none';
-      titleEl.style.borderBottom = '1px dashed transparent';
-      titleEl.addEventListener('focus', () => {
-        titleEl.style.borderBottom = '1px dashed #4ade80';
-      });
-      titleEl.addEventListener('blur', () => {
-        titleEl.style.borderBottom = '1px dashed transparent';
-      });
-      titleEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
+  // Check for recent versions (within last 30 seconds) from different authors
+  checkForConflicts(cardIndex);
+}
+
+// Handle version changes
+function handleVersionChanged(snapshot) {
+  const cardIndex = parseInt(snapshot.key);
+  if (isNaN(cardIndex)) return;
+  
+  checkForConflicts(cardIndex);
+}
+
+// Check for conflicts and show version history if multiple recent edits
+async function checkForConflicts(cardIndex) {
+  if (!db || !CONTENT_ID) return;
+  
+  const versionsRef = db.ref('versions/' + CONTENT_ID + '/' + cardIndex);
+  const snapshot = await versionsRef.orderByChild('timestamp').limitToLast(5).once('value');
+  const versions = snapshot.val();
+  
+  if (!versions) return;
+  
+  const versionArray = Object.values(versions);
+  const now = Date.now();
+  const recentThreshold = 60000; // 1 minute
+  
+  // Filter to recent versions
+  const recentVersions = versionArray.filter(v => now - v.timestamp < recentThreshold);
+  
+  // Check if multiple authors edited recently
+  const authors = [...new Set(recentVersions.map(v => v.author))];
+  
+  if (authors.length > 1) {
+    // Conflict detected! Show version comparison UI
+    showConflictUI(cardIndex, recentVersions);
+  }
+}
+
+// Show conflict resolution UI
+function showConflictUI(cardIndex, versions) {
+  const cardElements = document.querySelectorAll('.card');
+  if (!cardElements[cardIndex]) return;
+  
+  const cardEl = cardElements[cardIndex];
+  
+  // Check if conflict panel already exists
+  let conflictPanel = cardEl.querySelector('.conflict-panel');
+  if (conflictPanel) {
+    // Update existing panel
+    updateConflictPanel(conflictPanel, versions);
+    return;
+  }
+  
+  // Create conflict panel
+  conflictPanel = document.createElement('div');
+  conflictPanel.className = 'conflict-panel';
+  conflictPanel.style.cssText = 'position:absolute;left:0;right:0;bottom:0;background:#1a1a2e;border-top:2px solid #f59e0b;padding:8px;z-index:100;max-height:150px;overflow-y:auto;border-radius:0 0 8px 8px;';
+  
+  updateConflictPanel(conflictPanel, versions);
+  
+  cardEl.style.position = 'relative';
+  cardEl.appendChild(conflictPanel);
+  
+  // Auto-hide after 30 seconds
+  setTimeout(() => {
+    if (conflictPanel.parentNode) {
+      conflictPanel.remove();
     }
-    
-    if (contentEl) {
-      contentEl.setAttribute('contenteditable', 'true');
-      contentEl.style.cursor = 'text';
-      contentEl.style.outline = 'none';
-      contentEl.style.border = '1px dashed transparent';
-      contentEl.style.borderRadius = '4px';
-      contentEl.style.padding = '4px';
-      contentEl.style.minHeight = '50px';
-      contentEl.addEventListener('focus', () => {
-        contentEl.style.border = '1px dashed #4ade80';
-      });
-      contentEl.addEventListener('blur', () => {
-        contentEl.style.border = '1px dashed transparent';
-      });
-      contentEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
-    }
-    
-    // Hide the edit button since we're doing inline editing
-    const editBtn = cardEl.querySelector('.edit-btn');
-    if (editBtn) editBtn.style.display = 'none';
+  }, 30000);
+}
+
+// Update conflict panel content
+function updateConflictPanel(panel, versions) {
+  // Sort by timestamp (newest first)
+  const sorted = [...versions].sort((a, b) => b.timestamp - a.timestamp);
+  
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:11px;color:#f59e0b;font-weight:600;">⚠️ Multiple edits detected</span><button onclick="this.closest(\'.conflict-panel\').remove()" style="background:none;border:none;color:#888;cursor:pointer;font-size:14px;">✕</button></div>';
+  
+  sorted.slice(0, 3).forEach(version => {
+    const color = version.color || getAuthorColor(version.author);
+    const time = new Date(version.timestamp).toLocaleTimeString();
+    html += `
+      <div style="border-left:3px solid ${color};padding:4px 8px;margin:4px 0;background:#252525;border-radius:0 4px 4px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;color:${color};font-weight:600;">${version.author}</span>
+          <span style="font-size:9px;color:#666;">${time}</span>
+        </div>
+        <div style="font-size:11px;color:#ccc;margin-top:2px;max-height:40px;overflow:hidden;">${version.content.substring(0, 100)}${version.content.length > 100 ? '...' : ''}</div>
+        <button onclick="applyVersion(${panel.closest('.card') ? Array.from(document.querySelectorAll('.card')).indexOf(panel.closest('.card')) : 0}, '${btoa(unescape(encodeURIComponent(version.title)))}', '${btoa(unescape(encodeURIComponent(version.content)))}')" style="background:#4ade80;color:#1a1a1a;border:none;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;margin-top:4px;">Use this version</button>
+      </div>
+    `;
   });
   
-  console.log('[EditSystem] Inline editing enabled for all cards');
+  panel.innerHTML = html;
+}
+
+// Apply a specific version
+function applyVersion(cardIndex, encodedTitle, encodedContent) {
+  const title = decodeURIComponent(escape(atob(encodedTitle)));
+  const content = decodeURIComponent(escape(atob(encodedContent)));
+  
+  // Update local data
+  if (cardsData[cardIndex]) {
+    cardsData[cardIndex].title = title;
+    cardsData[cardIndex].content = content;
+  }
+  
+  // Update DOM
+  const cardElements = document.querySelectorAll('.card');
+  if (cardElements[cardIndex]) {
+    const cardEl = cardElements[cardIndex];
+    const titleEl = cardEl.querySelector('.card-title');
+    const contentEl = cardEl.querySelector('.card-content');
+    if (titleEl) titleEl.innerHTML = renderContent(title);
+    if (contentEl) contentEl.innerHTML = renderContent(content);
+    
+    // Remove conflict panel
+    const conflictPanel = cardEl.querySelector('.conflict-panel');
+    if (conflictPanel) conflictPanel.remove();
+  }
+  
+  // Save this as the new version
+  if (cardsRef) {
+    cardsRef.child(cardIndex.toString()).set({
+      title: title,
+      content: content,
+      updatedBy: localNickname || 'Anonymous',
+      updatedAt: Date.now()
+    });
+  }
+  
+  showToast('✅ Version applied');
+}
+
+// Enable inline editing for all cards (Google Docs style) - DISABLED due to cursor issues
+// Using modal-based editing instead with conflict detection
+function enableInlineEditing() {
+  // Inline editing disabled - using modal approach with conflict resolution
+  console.log('[EditSystem] Using modal-based editing with conflict detection');
 }
 
 // Debounce save to prevent too many Firebase writes
@@ -3312,6 +3434,35 @@ async function submitEdit() {
   // FULL PERMISSION MODE: Save directly and sync to all viewers
   if (FULL_PERMISSION) {
     try {
+      const editerId = localNickname || 'Anonymous';
+      const timestamp = Date.now();
+      
+      // Instead of overwriting, add this version as a new entry
+      // The card will show all recent versions color-coded
+      if (cardsRef) {
+        // Save to versions history for this card
+        const versionsRef = db.ref('versions/' + CONTENT_ID + '/' + currentEditCardIndex);
+        
+        // Push new version
+        await versionsRef.push({
+          title: newTitle,
+          content: newContent,
+          author: editerId,
+          color: getAuthorColor(editerId),
+          timestamp: timestamp
+        });
+        
+        // Also update the main card data (latest wins for display)
+        await cardsRef.child(currentEditCardIndex.toString()).set({
+          title: newTitle,
+          content: newContent,
+          updatedBy: editerId,
+          updatedAt: timestamp
+        });
+        
+        console.log('[EditSystem] Version saved to Firebase');
+      }
+      
       // Update local cardsData
       cardsData[currentEditCardIndex].title = newTitle;
       cardsData[currentEditCardIndex].content = newContent;
@@ -3324,17 +3475,6 @@ async function submitEdit() {
         const contentEl = cardEl.querySelector('.card-content');
         if (titleEl) titleEl.innerHTML = renderContent(newTitle);
         if (contentEl) contentEl.innerHTML = renderContent(newContent);
-      }
-      
-      // Sync to Firebase for other viewers
-      if (cardsRef) {
-        await cardsRef.child(currentEditCardIndex.toString()).set({
-          title: newTitle,
-          content: newContent,
-          updatedBy: localNickname || 'Anonymous',
-          updatedAt: Date.now()
-        });
-        console.log('[EditSystem] Card synced to Firebase');
       }
       
       showToast('✅ Card updated successfully!');
