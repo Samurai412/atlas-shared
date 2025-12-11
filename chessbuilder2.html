@@ -3114,6 +3114,12 @@ function initEditSystem() {
       const data = snapshot.val();
       if (isNaN(cardIndex) || !data) return;
       
+      // Skip DOM updates for the card we're currently editing
+      if (window.currentlyEditingCard === cardIndex) {
+        console.log('[EditSystem] Skipping update for card being edited:', cardIndex);
+        return;
+      }
+      
       // Update local data
       if (cardsData[cardIndex]) {
         cardsData[cardIndex].title = data.title;
@@ -3318,9 +3324,17 @@ function enableInlineEditing() {
       titleEl.style.borderBottom = '1px dashed transparent';
       titleEl.addEventListener('focus', () => {
         titleEl.style.borderBottom = '1px dashed #4ade80';
+        // Track which card is being edited
+        window.currentlyEditingCard = cardIndex;
       });
       titleEl.addEventListener('blur', () => {
         titleEl.style.borderBottom = '1px dashed transparent';
+        // Clear editing state after a delay (to allow saves to complete)
+        setTimeout(() => {
+          if (window.currentlyEditingCard === cardIndex) {
+            window.currentlyEditingCard = null;
+          }
+        }, 1000);
       });
       titleEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
     }
@@ -3335,9 +3349,15 @@ function enableInlineEditing() {
       contentEl.style.minHeight = '50px';
       contentEl.addEventListener('focus', () => {
         contentEl.style.border = '1px dashed #4ade80';
+        window.currentlyEditingCard = cardIndex;
       });
       contentEl.addEventListener('blur', () => {
         contentEl.style.border = '1px dashed transparent';
+        setTimeout(() => {
+          if (window.currentlyEditingCard === cardIndex) {
+            window.currentlyEditingCard = null;
+          }
+        }, 1000);
       });
       contentEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
     }
