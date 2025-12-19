@@ -1,0 +1,3734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dsasdadsa - ATLAS Face</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script>
+// Define initMath early so it's available for onload callbacks
+function initMath() {
+  if (typeof renderMathInElement !== 'undefined') {
+    try {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        trust: true
+      });
+    } catch(e) { console.warn('Math render error:', e); }
+  }
+}
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initMath()"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* Design System - Matching ATLAS Face App */
+:root{
+  /* Background layers */
+  --bg-void:#000000;
+  --bg-deep:#050505;
+  --bg-base:#0a0a0a;
+  --bg-surface:#0f0f0f;
+  --bg-elevated:#151515;
+  --bg-card:#1a1a1a;
+  --bg-card-hover:#1f1f1f;
+  
+  /* Text hierarchy */
+  --text-primary:#f0f0f0;
+  --text-secondary:#a0a0a0;
+  --text-tertiary:#707070;
+  --text-muted:#505050;
+  
+  /* Accent colors - ATLAS signature green */
+  --accent:#22c55e;
+  --accent-light:#4ade80;
+  --accent-glow:rgba(34,197,94,0.15);
+  --accent-border:rgba(34,197,94,0.3);
+  
+  /* Secondary accents */
+  --blue:#3b82f6;
+  --purple:#8b5cf6;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  
+  /* Borders and shadows */
+  --border:#252525;
+  --border-subtle:#1a1a1a;
+  --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+  --shadow-glow:0 0 20px var(--accent-glow);
+  
+  /* Radius */
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --radius-xl:20px;
+}
+
+/* Base */
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:var(--bg-void);
+  color:var(--text-primary);
+  line-height:1.65;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased
+}
+
+/* Header - Sticky navigation */
+.header{
+  background:linear-gradient(180deg,var(--bg-surface) 0%,rgba(15,15,15,0.95) 100%);
+  padding:1rem 2rem;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px)
+}
+.header h1{
+  font-size:1.1rem;
+  font-weight:600;
+  color:var(--text-primary);
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  letter-spacing:-0.01em
+}
+.header .logo{
+  width:36px;
+  height:36px;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);
+  border-radius:var(--radius-md);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:1.1rem;
+  color:var(--bg-void);
+  box-shadow:var(--shadow-glow)
+}
+.header-right{display:flex;align-items:center;gap:1rem}
+.view-toggle{
+  display:flex;
+  background:var(--bg-base);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:4px;
+  gap:4px
+}
+.view-btn{
+  background:transparent;
+  border:none;
+  color:var(--text-tertiary);
+  padding:.5rem 1rem;
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  font-size:.8rem;
+  font-weight:500;
+  transition:all .2s ease
+}
+.view-btn.active{background:var(--accent);color:var(--bg-void);font-weight:600}
+.view-btn:hover:not(.active){background:var(--bg-elevated);color:var(--text-secondary)}
+
+/* Container */
+.container{max-width:1400px;margin:0 auto;padding:2.5rem 2rem}
+
+/* Lesson Hero */
+.lesson-info{
+  text-align:center;
+  padding:3rem 2rem;
+  background:linear-gradient(135deg,var(--bg-surface) 0%,var(--bg-elevated) 50%,var(--bg-card) 100%);
+  border-radius:var(--radius-xl);
+  border:1px solid var(--border);
+  margin-bottom:2.5rem;
+  position:relative;
+  overflow:hidden
+}
+.lesson-info::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:3px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent)
+}
+.lesson-info h2{
+  font-size:2.25rem;
+  font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:.75rem;
+  letter-spacing:-0.02em
+}
+.lesson-info .stats{
+  color:var(--text-tertiary);
+  font-size:.9rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem
+}
+.lesson-info .stats::before{
+  content:'';
+  width:6px;
+  height:6px;
+  background:var(--accent);
+  border-radius:50%
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);
+  color:var(--bg-void);
+  border:none;
+  padding:1rem 2.5rem;
+  border-radius:var(--radius-md);
+  font-weight:600;
+  cursor:pointer;
+  font-size:.95rem;
+  margin-top:2rem;
+  transition:all .25s ease;
+  box-shadow:var(--shadow-sm),0 0 0 0 var(--accent-glow)
+}
+.btn-primary:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-lg),var(--shadow-glow)
+}
+.btn-primary:active{transform:translateY(-1px)}
+
+/* Card Grid */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(400px,1fr));
+  gap:1.5rem
+}
+.cards-list{display:flex;flex-direction:column;gap:1.25rem}
+.cards-list .card{max-width:100%}
+
+/* Card - Core styling matching app */
+.card{
+  background:var(--bg-card);
+  border-radius:var(--radius-lg);
+  padding:1.75rem;
+  border:1px solid var(--border);
+  transition:all .3s cubic-bezier(0.4,0,0.2,1);
+  cursor:pointer;
+  position:relative;
+  overflow:hidden
+}
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0;
+  transition:opacity .3s ease
+}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-md);
+  border-color:var(--accent-border);
+  background:var(--bg-card-hover)
+}
+.card:hover::before{opacity:1}
+.card.expanded{
+  grid-column:1/-1;
+  border-color:var(--accent);
+  box-shadow:var(--shadow-glow)
+}
+.card.expanded::before{opacity:1}
+
+/* Card Header */
+.card-header{
+  display:flex;
+  align-items:flex-start;
+  gap:1rem;
+  margin-bottom:1.25rem
+}
+.card-num{
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);
+  color:var(--bg-void);
+  min-width:36px;
+  height:36px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:.9rem;
+  flex-shrink:0;
+  box-shadow:var(--shadow-sm)
+}
+.card-title{
+  font-weight:600;
+  font-size:1.15rem;
+  flex-grow:1;
+  line-height:1.45;
+  color:var(--text-primary);
+  letter-spacing:-0.01em
+}
+.card-toggle{
+  color:var(--text-muted);
+  font-size:1.1rem;
+  transition:all .25s ease;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  padding:.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
+.card-toggle:hover{
+  border-color:var(--accent-border);
+  color:var(--accent)
+}
+.card.expanded .card-toggle{
+  transform:rotate(180deg);
+  background:var(--accent-glow);
+  border-color:var(--accent)
+}
+
+/* Card Content */
+.card-content{
+  color:var(--text-secondary);
+  font-size:.95rem;
+  line-height:1.8;
+  overflow:hidden
+}
+.card:not(.expanded) .card-content{
+  max-height:160px;
+  -webkit-mask-image:linear-gradient(#000 55%,transparent);
+  mask-image:linear-gradient(#000 55%,transparent)
+}
+
+/* Content Typography - Markdown & LaTeX */
+.card-content h1,.card-content h2,.card-content h3,.card-content h4,.card-content h5{
+  color:var(--text-primary);
+  margin:1.25rem 0 .75rem;
+  font-weight:600;
+  letter-spacing:-0.01em;
+  line-height:1.3
+}
+.card-content h1{font-size:1.6rem;border-bottom:1px solid var(--border);padding-bottom:.5rem}
+.card-content h2{font-size:1.35rem}
+.card-content h3{font-size:1.15rem}
+.card-content h4{font-size:1.05rem;color:var(--text-secondary)}
+.card-content p{margin-bottom:1rem}
+.card-content strong{color:var(--text-primary);font-weight:600}
+.card-content em{color:var(--accent-light);font-style:italic}
+.card-content ul,.card-content ol{margin:0 0 1rem 1.75rem}
+.card-content li{margin-bottom:.4rem}
+.card-content li::marker{color:var(--accent)}
+
+/* Code styling */
+.card-content code{
+  background:var(--bg-elevated);
+  padding:.2rem .5rem;
+  border-radius:var(--radius-sm);
+  font-family:'Fira Code',monospace;
+  font-size:.875em;
+  color:var(--accent-light);
+  border:1px solid var(--border)
+}
+.card-content pre{
+  background:var(--bg-base);
+  padding:1.25rem;
+  border-radius:var(--radius-md);
+  overflow-x:auto;
+  margin:1rem 0;
+  border:1px solid var(--border);
+  position:relative
+}
+.card-content pre::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--purple),var(--blue),var(--accent))
+}
+.card-content pre code{
+  padding:0;
+  background:none;
+  border:none;
+  color:var(--text-secondary);
+  font-size:.9rem;
+  line-height:1.6
+}
+
+/* Blockquotes */
+.card-content blockquote{
+  border-left:4px solid var(--accent);
+  background:var(--accent-glow);
+  padding:1rem 1.25rem;
+  margin:1rem 0;
+  border-radius:0 var(--radius-md) var(--radius-md) 0;
+  color:var(--text-secondary);
+  font-style:italic
+}
+.card-content blockquote p:last-child{margin-bottom:0}
+
+/* Images */
+.card-content img{
+  max-width:100%;
+  border-radius:var(--radius-md);
+  margin:1rem 0;
+  border:1px solid var(--border)
+}
+
+/* Links */
+.card-content a{
+  color:var(--accent);
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:border-color .2s
+}
+.card-content a:hover{border-bottom-color:var(--accent)}
+
+/* Tables */
+.card-content table{
+  width:100%;
+  border-collapse:collapse;
+  margin:1rem 0;
+  font-size:.9rem
+}
+.card-content th,.card-content td{
+  border:1px solid var(--border);
+  padding:.75rem 1rem;
+  text-align:left
+}
+.card-content th{
+  background:var(--bg-elevated);
+  font-weight:600;
+  color:var(--text-primary)
+}
+.card-content tr:hover td{background:var(--bg-surface)}
+
+/* Horizontal rules */
+.card-content hr{
+  border:none;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+  margin:1.5rem 0
+}
+
+/* KaTeX Math styling */
+.katex{font-size:1.05em}
+.katex-display{
+  margin:1.25rem 0;
+  padding:1rem;
+  background:var(--bg-surface);
+  border-radius:var(--radius-md);
+  border:1px solid var(--border);
+  overflow-x:auto
+}
+.katex-display>.katex{color:var(--accent-light)}
+
+/* Click hint */
+.click-hint{
+  color:var(--accent);
+  font-size:.8rem;
+  margin-top:1rem;
+  opacity:.6;
+  display:flex;
+  align-items:center;
+  gap:.5rem
+}
+.click-hint::before{content:'↓'}
+.card.expanded .click-hint{display:none}
+
+/* Footer */
+.footer{
+  text-align:center;
+  padding:2.5rem;
+  color:var(--text-muted);
+  font-size:.85rem;
+  border-top:1px solid var(--border);
+  margin-top:3rem
+}
+.footer a{color:var(--accent);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+
+/* Slideshow */
+.slideshow{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:var(--bg-void);
+  z-index:1000;
+  flex-direction:column
+}
+.slideshow.active{display:flex}
+.ss-header{
+  padding:1rem 2rem;
+  background:var(--bg-surface);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center
+}
+.ss-counter{
+  color:var(--text-tertiary);
+  font-size:.9rem;
+  font-weight:500
+}
+.ss-close{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  color:var(--text-secondary);
+  padding:.6rem 1.25rem;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  font-size:.85rem;
+  transition:all .2s
+}
+.ss-close:hover{
+  background:var(--bg-card);
+  border-color:var(--accent-border);
+  color:var(--text-primary)
+}
+.ss-content{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:3rem 2rem;
+  overflow-y:auto
+}
+.ss-slide{
+  max-width:900px;
+  width:100%;
+  background:var(--bg-card);
+  padding:3rem;
+  border-radius:var(--radius-xl);
+  border:1px solid var(--border)
+}
+.ss-slide h1{
+  font-size:2.25rem;
+  color:var(--accent);
+  margin-bottom:2rem;
+  text-align:center;
+  letter-spacing:-0.02em
+}
+.ss-slide .card-content{
+  font-size:1.1rem;
+  max-height:none;
+  -webkit-mask-image:none;
+  mask-image:none
+}
+.ss-footer{
+  padding:1rem 2rem;
+  background:var(--bg-surface);
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:center;
+  gap:1rem
+}
+.ss-nav{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  color:var(--text-secondary);
+  padding:.875rem 2rem;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  font-size:.9rem;
+  font-weight:500;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:.5rem
+}
+.ss-nav:hover:not(:disabled){
+  background:var(--bg-card);
+  border-color:var(--accent-border);
+  color:var(--text-primary)
+}
+.ss-nav:disabled{opacity:.35;cursor:not-allowed}
+
+/* Progress Bar */
+.progress-bar{
+  position:fixed;
+  top:0;
+  left:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-light));
+  transition:width .3s ease;
+  z-index:101;
+  box-shadow:0 0 10px var(--accent-glow)
+}
+
+/* Keyboard hint */
+.kbd-hint{
+  position:fixed;
+  bottom:1.5rem;
+  right:1.5rem;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  padding:.75rem 1rem;
+  border-radius:var(--radius-md);
+  font-size:.75rem;
+  color:var(--text-tertiary);
+  opacity:0;
+  transition:opacity .3s
+}
+.slideshow.active~.kbd-hint{opacity:1}
+kbd{
+  background:var(--bg-surface);
+  padding:.15rem .4rem;
+  border-radius:3px;
+  border:1px solid var(--border);
+  font-family:inherit;
+  margin:0 .15rem
+}
+
+/* AI Chat Styles */
+.chat-container{
+  position:fixed;
+  bottom:1.5rem;
+  left:1.5rem;
+  z-index:1000;
+  font-family:inherit
+}
+.chat-toggle{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  background:linear-gradient(135deg,var(--purple),var(--accent));
+  color:white;
+  padding:.75rem 1.25rem;
+  border-radius:var(--radius-full);
+  cursor:pointer;
+  box-shadow:var(--shadow-lg);
+  transition:all .3s ease;
+  position:relative
+}
+.chat-toggle:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(147,51,234,0.4)
+}
+.chat-icon{font-size:1.25rem}
+.chat-label{font-weight:600;font-size:.9rem}
+.chat-badge{
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  background:var(--accent);
+  color:white;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.75rem;
+  font-weight:bold;
+  animation:pulse 2s infinite
+}
+@keyframes pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.1)}
+}
+@keyframes fadeOut{
+  0%{opacity:1}
+  70%{opacity:1}
+  100%{opacity:0}
+}
+.chat-panel{
+  display:none;
+  flex-direction:column;
+  width:380px;
+  max-width:calc(100vw - 3rem);
+  height:500px;
+  max-height:calc(100vh - 120px);
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  overflow:hidden;
+  position:absolute;
+  bottom:60px;
+  left:0
+}
+.chat-panel.open{
+  display:flex;
+  animation:slideUp .3s ease
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.chat-header{
+  padding:1rem 1.25rem;
+  background:linear-gradient(135deg,var(--bg-elevated),var(--bg-surface));
+  border-bottom:1px solid var(--border);
+  position:relative
+}
+.chat-header h3{
+  margin:0;
+  font-size:1rem;
+  color:var(--text-primary);
+  display:flex;
+  align-items:center;
+  gap:.5rem
+}
+.chat-subtitle{
+  margin:.25rem 0 0;
+  font-size:.75rem;
+  color:var(--text-tertiary)
+}
+.chat-close{
+  position:absolute;
+  top:.75rem;
+  right:.75rem;
+  background:none;
+  border:none;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-size:1.25rem;
+  padding:.25rem;
+  transition:color .2s
+}
+.chat-close:hover{color:var(--text-primary)}
+.chat-messages{
+  flex:1;
+  overflow-y:auto;
+  padding:1rem;
+  display:flex;
+  flex-direction:column;
+  gap:.75rem;
+  scroll-behavior:smooth
+}
+.chat-message{
+  display:flex;
+  flex-direction:column;
+  max-width:85%
+}
+.chat-message.user{align-self:flex-end}
+.chat-message.ai{align-self:flex-start}
+.chat-message.system{align-self:center;max-width:95%}
+.msg-content{
+  padding:.75rem 1rem;
+  border-radius:var(--radius-md);
+  font-size:.9rem;
+  line-height:1.5
+}
+.chat-message.user .msg-content{
+  background:linear-gradient(135deg,var(--purple),#7c3aed);
+  color:white;
+  border-bottom-right-radius:4px
+}
+.chat-message.ai .msg-content{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  color:var(--text-primary);
+  border-bottom-left-radius:4px
+}
+.chat-message.system .msg-content{
+  background:var(--accent-glow);
+  color:var(--accent);
+  text-align:center;
+  font-size:.85rem
+}
+.msg-sender{
+  font-size:.7rem;
+  color:var(--text-muted);
+  margin-bottom:.25rem;
+  padding-left:.25rem
+}
+.chat-message.user .msg-sender{text-align:right;padding-right:.25rem}
+.chat-input-area{
+  display:flex;
+  gap:.5rem;
+  padding:.75rem 1rem;
+  border-top:1px solid var(--border);
+  background:var(--bg-surface)
+}
+.chat-input-area input{
+  flex:1;
+  background:var(--bg-base);
+  border:1px solid var(--border);
+  color:var(--text-primary);
+  padding:.6rem .875rem;
+  border-radius:var(--radius-md);
+  font-size:.9rem;
+  transition:border-color .2s
+}
+.chat-input-area input:focus{
+  outline:none;
+  border-color:var(--purple)
+}
+.chat-input-area input::placeholder{color:var(--text-muted)}
+.chat-send{
+  background:linear-gradient(135deg,var(--purple),var(--accent));
+  border:none;
+  color:white;
+  width:40px;
+  height:40px;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1rem;
+  transition:transform .2s,box-shadow .2s
+}
+.chat-send:hover{
+  transform:scale(1.05);
+  box-shadow:0 4px 15px rgba(147,51,234,0.4)
+}
+.chat-send:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+  transform:none
+}
+.chat-powered{
+  text-align:center;
+  font-size:.65rem;
+  color:var(--text-muted);
+  padding:.5rem;
+  margin:0;
+  border-top:1px solid var(--border-subtle)
+}
+.typing-indicator{
+  display:flex;
+  gap:4px;
+  padding:.5rem
+}
+.typing-indicator span{
+  width:8px;
+  height:8px;
+  background:var(--text-muted);
+  border-radius:50%;
+  animation:typing 1.4s infinite ease-in-out
+}
+.typing-indicator span:nth-child(1){animation-delay:0s}
+.typing-indicator span:nth-child(2){animation-delay:.2s}
+.typing-indicator span:nth-child(3){animation-delay:.4s}
+@keyframes typing{
+  0%,60%,100%{transform:translateY(0)}
+  30%{transform:translateY(-8px)}
+}
+@media(max-width:480px){
+  .chat-container{
+    bottom:1rem;
+    left:1rem;
+    right:1rem
+  }
+  .chat-panel{
+    width:100%;
+    max-width:none;
+    left:0;
+    right:0;
+    bottom:50px
+  }
+  .chat-label{display:none}
+}
+
+/* Responsive */
+@media(max-width:768px){
+  .container{padding:1.5rem 1rem}
+  .cards-grid{grid-template-columns:1fr}
+  .lesson-info{padding:2rem 1.5rem}
+  .lesson-info h2{font-size:1.6rem}
+  .header{padding:.875rem 1rem}
+  .header h1{font-size:1rem}
+  .view-toggle{display:none}
+  .card{padding:1.25rem}
+  .ss-slide{padding:2rem 1.5rem}
+  .ss-slide h1{font-size:1.75rem}
+}
+
+/* Print styles */
+@media print{
+  .header,.btn-primary,.view-toggle,.card-toggle,.click-hint,.ss-footer,.controls-bar,.search-container,.theme-toggle{display:none!important}
+  .card{break-inside:avoid;page-break-inside:avoid}
+  .card-content{max-height:none!important;mask-image:none!important}
+  body{background:#fff;color:#000}
+  .card{background:#f9f9f9!important;border:1px solid #ddd!important}
+}
+
+/* Theme Toggle */
+.theme-toggle{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  color:var(--text-secondary);
+  width:40px;
+  height:40px;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.1rem;
+  transition:all .2s
+}
+.theme-toggle:hover{
+  background:var(--bg-card);
+  border-color:var(--accent-border);
+  color:var(--accent)
+}
+
+/* Theme Selector Dropdown */
+.theme-selector{
+  position:relative;
+}
+.theme-selector-btn{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  color:var(--text-secondary);
+  padding:8px 12px;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:0.85rem;
+  transition:all .2s
+}
+.theme-selector-btn:hover{
+  background:var(--bg-card);
+  border-color:var(--accent-border);
+  color:var(--text-primary)
+}
+.theme-menu{
+  position:absolute;
+  top:100%;
+  right:0;
+  margin-top:8px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:6px;
+  min-width:150px;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-10px);
+  transition:all .2s ease;
+  z-index:1000;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.theme-menu.open{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.theme-option{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:10px 12px;
+  background:transparent;
+  border:none;
+  color:var(--text-secondary);
+  font-size:0.9rem;
+  cursor:pointer;
+  border-radius:var(--radius-sm);
+  transition:all .2s;
+  text-align:left;
+}
+.theme-option:hover{
+  background:var(--bg-card);
+  color:var(--text-primary);
+}
+.theme-option.active{
+  background:var(--accent-glow);
+  color:var(--accent);
+  font-weight:500;
+}
+.theme-dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  border:2px solid currentColor;
+  flex-shrink:0;
+}
+.theme-dot.dark{background:#1a1a2e}
+.theme-dot.light{background:#f1f3f4}
+.theme-dot.lain{background:#00ff41}
+.theme-dot.sakura{background:#ec4899}
+.theme-dot.nonov{background:#7b00ba}
+
+/* Light theme */
+body.light{
+  --bg-void:#ffffff;
+  --bg-deep:#f8f9fa;
+  --bg-base:#f1f3f4;
+  --bg-surface:#e8eaed;
+  --bg-elevated:#dadce0;
+  --bg-card:#ffffff;
+  --bg-card-hover:#f8f9fa;
+  --text-primary:#202124;
+  --text-secondary:#5f6368;
+  --text-tertiary:#80868b;
+  --text-muted:#9aa0a6;
+  --border:#dadce0;
+  --border-subtle:#e8eaed;
+  --accent:#1a73e8;
+  --accent-light:#4285f4;
+  --accent-glow:rgba(26,115,232,0.1);
+  --accent-border:rgba(26,115,232,0.3)
+}
+body.light .logo{color:#fff}
+body.light .card{box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+body.light .card:hover{box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+
+/* Lain Theme - Serial Experiments Lain CRT aesthetic */
+body.lain{
+  --bg-void:#000000;
+  --bg-deep:#050505;
+  --bg-base:#0a0a0a;
+  --bg-surface:#0d0d0d;
+  --bg-elevated:#0f0f0f;
+  --bg-card:#0a0a0a;
+  --bg-card-hover:#101510;
+  --text-primary:#c8d4b8;
+  --text-secondary:#709070;
+  --text-tertiary:#506050;
+  --text-muted:#405040;
+  --border:#1a1a1a;
+  --border-subtle:#141414;
+  --accent:#00ff41;
+  --accent-light:#00cc33;
+  --accent-glow:rgba(0,255,65,0.2);
+  --accent-border:rgba(0,255,65,0.4);
+  --purple:#00ff41;
+  font-family:'Fira Code','Courier New','Consolas',monospace;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(0,0,0,0.9),rgba(0,0,0,0.9) 2px,rgba(0,255,65,0.015) 2px,rgba(0,255,65,0.015) 3px),
+    repeating-linear-gradient(90deg,transparent,transparent 4px,rgba(0,255,65,0.008) 4px,rgba(0,255,65,0.008) 5px);
+  background-size:100% 3px,5px 100%;
+  background-attachment:fixed
+}
+body.lain .card{border-color:rgba(0,255,65,0.2);background:#0a0a0a}
+body.lain .card:hover{border-color:rgba(0,255,65,0.5);box-shadow:0 0 25px rgba(0,255,65,0.15)}
+body.lain .btn-primary{background:linear-gradient(135deg,#00ff41,#00cc33);color:#000}
+body.lain .logo{color:#00ff41;text-shadow:0 0 10px rgba(0,255,65,0.5)}
+
+/* Sakura Theme - Pink/Purple artistic aesthetic (was Lea) */
+body.sakura{
+  --bg-void:#1a1215;
+  --bg-deep:#211419;
+  --bg-base:#2a1a21;
+  --bg-surface:#352027;
+  --bg-elevated:#40262e;
+  --bg-card:#352027;
+  --bg-card-hover:#422a33;
+  --text-primary:#f8e8f0;
+  --text-secondary:#c89ab0;
+  --text-tertiary:#a07888;
+  --text-muted:#7a5868;
+  --border:rgba(236,72,153,0.3);
+  --border-subtle:rgba(236,72,153,0.15);
+  --accent:#ec4899;
+  --accent-light:#f472b6;
+  --accent-glow:rgba(236,72,153,0.2);
+  --accent-border:rgba(236,72,153,0.5);
+  --purple:#a855f7;
+  background-image:
+    repeating-conic-gradient(from 30deg at 25% 75%,transparent 0deg,rgba(236,72,153,0.015) 60deg,transparent 120deg,rgba(168,85,247,0.01) 180deg,transparent 240deg),
+    repeating-linear-gradient(73deg,transparent,transparent 12px,rgba(236,72,153,0.01) 12px,rgba(236,72,153,0.01) 13px);
+  background-size:40px 40px,25px 25px
+}
+body.sakura .card{border-color:rgba(236,72,153,0.25)}
+body.sakura .card:hover{border-color:rgba(236,72,153,0.5);box-shadow:0 0 25px rgba(236,72,153,0.15)}
+body.sakura .btn-primary{background:linear-gradient(135deg,#ec4899,#a855f7)}
+body.sakura .logo{color:#ec4899}
+
+/* Nonov Theme - Dark Purple with Green accents */
+body.nonov{
+  --bg-void:#1a181f;
+  --bg-deep:#1e1c23;
+  --bg-base:#25222b;
+  --bg-surface:#2d2a35;
+  --bg-elevated:#35323f;
+  --bg-card:#2d2a35;
+  --bg-card-hover:#38354a;
+  --text-primary:#ededed;
+  --text-secondary:#a5a5a5;
+  --text-tertiary:#888;
+  --text-muted:#666;
+  --border:#403a4d;
+  --border-subtle:#302a3d;
+  --accent:#7b00ba;
+  --accent-light:#9b20da;
+  --accent-glow:rgba(123,0,186,0.25);
+  --accent-border:rgba(123,0,186,0.5);
+  --purple:#7b00ba;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(123,0,186,0.01) 39px,rgba(123,0,186,0.01) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(3,115,0,0.008) 39px,rgba(3,115,0,0.008) 40px);
+  background-size:40px 40px,40px 40px
+}
+body.nonov .card{border-color:rgba(123,0,186,0.3)}
+body.nonov .card:hover{border-color:rgba(123,0,186,0.5);box-shadow:0 0 20px rgba(123,0,186,0.15)}
+body.nonov .btn-primary{background:linear-gradient(135deg,#7b00ba,#037300);color:#fff}
+body.nonov .logo{color:#7b00ba}
+
+/* Search */
+.search-container{
+  max-width:300px;
+  position:relative
+}
+.search-input{
+  width:100%;
+  padding:.6rem 1rem .6rem 2.5rem;
+  background:var(--bg-base);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  color:var(--text-primary);
+  font-size:.85rem;
+  transition:all .2s
+}
+.search-input:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow)
+}
+.search-input::placeholder{color:var(--text-muted)}
+.search-icon{
+  position:absolute;
+  left:.75rem;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--text-muted);
+  font-size:.9rem
+}
+.search-clear{
+  position:absolute;
+  right:.5rem;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  color:var(--text-muted);
+  cursor:pointer;
+  padding:.25rem;
+  display:none
+}
+.search-clear.visible{display:block}
+.search-clear:hover{color:var(--text-primary)}
+
+/* Controls Bar */
+.controls-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.75rem;
+  align-items:center;
+  justify-content:center;
+  margin-top:1.5rem
+}
+.control-btn{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  color:var(--text-secondary);
+  padding:.6rem 1.25rem;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  font-size:.85rem;
+  font-weight:500;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  transition:all .2s
+}
+.control-btn:hover{
+  background:var(--bg-card);
+  border-color:var(--accent-border);
+  color:var(--text-primary)
+}
+.control-btn.active{
+  background:var(--accent-glow);
+  border-color:var(--accent);
+  color:var(--accent)
+}
+
+/* Card enhancements */
+.card.hidden{display:none}
+.card.bookmarked{border-color:var(--amber);box-shadow:0 0 12px rgba(245,158,11,0.15)}
+.card.bookmarked .card-num{background:linear-gradient(135deg,var(--amber),#fbbf24)}
+.bookmark-btn,.edit-btn{
+  background:none;
+  border:none;
+  color:var(--text-muted);
+  cursor:pointer;
+  padding:.25rem;
+  font-size:1rem;
+  transition:all .2s
+}
+.bookmark-btn:hover{color:var(--amber)}
+.bookmark-btn.active{color:var(--amber)}
+.edit-btn:hover{color:var(--accent)}
+
+/* Edit Modal Styles */
+.modal-overlay{
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.8);
+  backdrop-filter:blur(4px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+  opacity:0;
+  transition:opacity .3s
+}
+.modal-overlay.open{opacity:1}
+.edit-modal-content{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  width:90%;
+  max-width:560px;
+  max-height:90vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  transform:scale(0.9);
+  transition:transform .3s
+}
+.modal-overlay.open .edit-modal-content{transform:scale(1)}
+.edit-modal-header{
+  padding:1.25rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between
+}
+.edit-modal-header h3{
+  margin:0;
+  color:var(--accent);
+  font-size:1.1rem
+}
+.edit-modal-close{
+  background:none;
+  border:none;
+  color:var(--text-muted);
+  font-size:1.25rem;
+  cursor:pointer;
+  padding:.25rem;
+  transition:color .2s
+}
+.edit-modal-close:hover{color:var(--red)}
+.edit-modal-body{
+  padding:1.5rem;
+  overflow-y:auto;
+  flex:1
+}
+.edit-label{
+  display:block;
+  font-size:.85rem;
+  color:var(--text-secondary);
+  margin-bottom:.5rem;
+  font-weight:500
+}
+.edit-input{
+  width:100%;
+  padding:.75rem 1rem;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text-primary);
+  font-size:.95rem;
+  transition:border-color .2s
+}
+.edit-input:focus{
+  outline:none;
+  border-color:var(--accent)
+}
+.edit-textarea{
+  width:100%;
+  min-height:200px;
+  padding:.75rem 1rem;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text-primary);
+  font-size:.95rem;
+  font-family:inherit;
+  resize:vertical;
+  transition:border-color .2s
+}
+.edit-textarea:focus{
+  outline:none;
+  border-color:var(--accent)
+}
+.edit-modal-footer{
+  padding:1rem 1.5rem;
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:flex-end;
+  gap:.75rem
+}
+.edit-btn-cancel{
+  padding:.6rem 1.25rem;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text-secondary);
+  cursor:pointer;
+  font-size:.9rem;
+  transition:all .2s
+}
+.edit-btn-cancel:hover{
+  background:var(--bg-surface);
+  color:var(--text-primary)
+}
+.edit-btn-submit{
+  padding:.6rem 1.25rem;
+  background:var(--accent);
+  border:none;
+  border-radius:var(--radius-sm);
+  color:#000;
+  font-weight:600;
+  cursor:pointer;
+  font-size:.9rem;
+  transition:all .2s
+}
+.edit-btn-submit:hover{
+  background:var(--accent-light);
+  transform:translateY(-1px)
+}
+
+/* Reading time badge */
+.reading-time{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  background:var(--bg-elevated);
+  padding:.35rem .75rem;
+  border-radius:var(--radius-sm);
+  font-size:.8rem;
+  color:var(--text-tertiary);
+  margin-left:.75rem
+}
+
+/* Shuffle animation */
+@keyframes shuffleIn{
+  from{opacity:0;transform:scale(0.8) rotate(-5deg)}
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
+.card.shuffling{animation:shuffleIn .4s ease-out}
+
+/* Drag and Drop */
+.cards-freeform{
+  display:block;
+  position:relative;
+  min-height:600px;
+  background:repeating-linear-gradient(0deg,transparent,transparent 49px,var(--border-subtle) 49px,var(--border-subtle) 50px),
+             repeating-linear-gradient(90deg,transparent,transparent 49px,var(--border-subtle) 49px,var(--border-subtle) 50px);
+  background-size:50px 50px;
+  border:2px dashed var(--border);
+  border-radius:var(--radius-lg);
+  padding:1rem
+}
+.cards-freeform .card{
+  position:absolute;
+  width:320px;
+  height:220px;
+  min-height:auto;
+  overflow:hidden;
+  user-select:none;
+  transition:box-shadow .2s, z-index 0s
+}
+.cards-freeform .card:hover{
+  transform:none
+}
+.cards-freeform .card.dragging{
+  z-index:1000;
+  box-shadow:0 20px 40px rgba(0,0,0,0.5);
+  opacity:0.9;
+  cursor:grabbing
+}
+.cards-freeform .card .resize-handle{
+  position:absolute;
+  bottom:0;
+  right:0;
+  width:20px;
+  height:20px;
+  cursor:nwse-resize;
+  background:linear-gradient(135deg,transparent 50%,var(--accent) 50%);
+  border-radius:0 0 var(--radius-lg) 0;
+  opacity:0;
+  transition:opacity .2s
+}
+.cards-freeform .card:hover .resize-handle{
+  opacity:1
+}
+.cards-freeform .card .drag-handle{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:30px;
+  cursor:grab;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-muted);
+  font-size:1.2rem;
+  opacity:0;
+  transition:opacity .2s
+}
+.cards-freeform .card:hover .drag-handle{
+  opacity:1
+}
+.cards-freeform .card.dragging .drag-handle{
+  cursor:grabbing
+}
+.cards-freeform .card.resizing{
+  opacity:0.9;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4)
+}
+.cards-freeform .card.resizing .resize-handle{
+  opacity:1;
+  background:linear-gradient(135deg,transparent 50%,var(--purple) 50%)
+}
+/* Freeform card content styling */
+.cards-freeform .card .card-content{
+  max-height:calc(100% - 70px);
+  overflow-y:auto;
+  padding-right:8px
+}
+.cards-freeform .card .card-content::-webkit-scrollbar{
+  width:6px
+}
+.cards-freeform .card .card-content::-webkit-scrollbar-thumb{
+  background:var(--border);
+  border-radius:3px
+}
+.cards-freeform .card .card-content::-webkit-scrollbar-thumb:hover{
+  background:var(--text-muted)
+}
+.cards-freeform .card .card-header{
+  padding-right:30px
+}
+/* Grid mode - hide drag/resize handles */
+.cards-grid .drag-handle,
+.cards-grid .resize-handle{
+  display:none
+}
+
+/* Freeform mode toggle */
+.layout-toggle{
+  display:flex;
+  background:var(--bg-base);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:4px;
+  gap:4px;
+  margin-left:1rem
+}
+.layout-btn{
+  background:transparent;
+  border:none;
+  color:var(--text-tertiary);
+  padding:.5rem .75rem;
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  font-size:.8rem;
+  transition:all .2s
+}
+.layout-btn.active{
+  background:var(--purple);
+  color:white
+}
+.layout-btn:hover:not(.active){
+  background:var(--bg-elevated);
+  color:var(--text-secondary)
+}
+
+/* Fullscreen mode */
+body.fullscreen .header,
+body.fullscreen .footer{display:none}
+body.fullscreen .container{max-width:100%;padding:1rem}
+body.fullscreen .lesson-info{margin-bottom:1rem;padding:1.5rem}
+
+/* Toast notifications */
+.toast{
+  position:fixed;
+  bottom:2rem;
+  left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  padding:1rem 1.5rem;
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-lg);
+  z-index:1001;
+  opacity:0;
+  transition:all .3s ease
+}
+.toast.visible{
+  transform:translateX(-50%) translateY(0);
+  opacity:1
+}
+.toast.success{border-color:var(--accent);background:rgba(34,197,94,0.1)}
+.toast.success::before{content:'✓ ';color:var(--accent)}
+
+/* Stats indicator */
+.stats-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.3rem;
+  background:var(--accent-glow);
+  color:var(--accent);
+  padding:.25rem .6rem;
+  border-radius:var(--radius-sm);
+  font-size:.75rem;
+  font-weight:600
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progress"></div>
+<div class="header">
+  <h1><span class="logo">A</span>ATLAS Face</h1>
+  <div class="header-right">
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="search" placeholder="Search cards..." oninput="handleSearch(this.value)">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" onclick="setView('grid')">Grid</button>
+      <button class="view-btn" onclick="setView('list')">List</button>
+    </div>
+    <div class="theme-selector">
+      <button class="theme-selector-btn" onclick="toggleThemeMenu()" title="Change theme">
+        <span id="themeIcon">🌙</span>
+        <span id="themeName">Dark</span>
+      </button>
+      <div class="theme-menu" id="themeMenu">
+        <button class="theme-option active" onclick="setTheme('dark')" data-theme="dark">
+          <span class="theme-dot dark"></span> Dark
+        </button>
+        <button class="theme-option" onclick="setTheme('light')" data-theme="light">
+          <span class="theme-dot light"></span> Light
+        </button>
+        <button class="theme-option" onclick="setTheme('lain')" data-theme="lain">
+          <span class="theme-dot lain"></span> Lain 💻
+        </button>
+        <button class="theme-option" onclick="setTheme('sakura')" data-theme="sakura">
+          <span class="theme-dot sakura"></span> Sakura 🌸
+        </button>
+        <button class="theme-option" onclick="setTheme('nonov')" data-theme="nonov">
+          <span class="theme-dot nonov"></span> Nonov 💜
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="lesson-info">
+    <h2>dsasdadsa</h2>
+    <p class="stats">
+      1 card
+      <span class="reading-time" id="readingTime">⏱ ~1 min read</span>
+    </p>
+    <div class="controls-bar">
+      <button class="btn-primary" onclick="startSlideshow()">▶ Start Slideshow</button>
+      
+      <button class="control-btn" onclick="shuffleCards()" title="Shuffle cards for random study">🔀 Shuffle</button>
+      <button class="control-btn" onclick="expandAll()" title="Expand all cards">📖 Expand All</button>
+      <button class="control-btn" id="bookmarkFilter" onclick="toggleBookmarkFilter()" title="Show bookmarked only">⭐ Bookmarked (<span id="bookmarkCount">0</span>)</button>
+      <button class="control-btn" onclick="toggleFullscreen()" title="Toggle fullscreen">⛶ Focus</button>
+      <div class="layout-toggle">
+        <button class="layout-btn active" id="gridModeBtn" onclick="setLayout('grid')" title="Grid layout">▦ Grid</button>
+        <button class="layout-btn" id="freeformModeBtn" onclick="setLayout('freeform')" title="Freeform - drag & resize cards">⊞ Freeform</button>
+      </div>
+    </div>
+  </div>
+  <div class="cards-grid" id="cards">
+    <div class="card" onclick="toggleCard(this, event)" data-index="0" data-title="dsadas" data-content="&lt;p&gt;dsadsadassd&lt;/p&gt;">
+      <div class="drag-handle">⋮⋮</div>
+      <div class="card-header">
+        <span class="card-num">1</span>
+        <span class="card-title">dsadas</span>
+        <button class="edit-btn" onclick="event.stopPropagation();openEditModal(0)" title="Suggest an edit">✏️</button>
+        <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="card-content" id="content-0"></div>
+      <div class="click-hint">Click to expand</div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Group Chat -->
+<div class="chat-container" id="chatContainer">
+  <div class="chat-toggle" id="chatToggle" onclick="toggleChat()">
+    <span class="chat-icon">💬</span>
+    <span class="chat-label">Group Chat</span>
+    <span class="chat-badge" id="chatBadge" style="display:none">!</span>
+  </div>
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+      <h3>💬 Live Study Group</h3>
+      <p class="chat-subtitle">Loading...</p>
+      <button class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message system">
+        <div class="msg-content">
+          <p>🔄 Connecting to group chat...</p>
+        </div>
+      </div>
+    </div>
+    <div class="chat-key-input" id="chatKeyInput" style="display:none;padding:0.75rem;background:#252525;border-top:1px solid #333;">
+      <p style="margin:0 0 0.5rem;font-size:0.75rem;color:#888;">Enter your Groq or Mistral API key to enable AI chat:</p>
+      <div style="display:flex;gap:0.5rem;">
+        <input type="password" id="visitorApiKey" placeholder="Groq / Mistral API Key" style="flex:1;padding:0.5rem;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#e8e8e8;font-size:0.8rem;">
+        <button onclick="saveVisitorKey()" style="background:#22c55e;color:white;border:none;padding:0.5rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.8rem;">Save</button>
+      </div>
+      <p style="margin:0.5rem 0 0;font-size:0.65rem;color:#666;">Get free key at <a href="https://console.groq.com" target="_blank" style="color:#a78bfa;">console.groq.com</a> • Key stored locally only</p>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Chat here... use @Amadeus to ask AI" onkeydown="if(event.key==='Enter')sendMessage()" disabled>
+      <button class="chat-send" onclick="sendMessage()" disabled>➤</button>
+    </div>
+    <p class="chat-powered">💡 Live group chat • Type @Amadeus to ask AI</p>
+  </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<div class="footer">
+  <p>Created with <a href="https://github.com/atlas-face" target="_blank">ATLAS Face</a> • Your AI-Powered Learning Companion</p>
+  <p style="margin-top:.5rem;font-size:.75rem;color:var(--text-muted)">
+    <span class="stats-badge" id="progressStats">0/1 viewed</span>
+  </p>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="slideshow" id="slideshow">
+  <div class="ss-header">
+    <span class="ss-counter" id="ss-counter">1 / 1</span>
+    <button class="ss-close" onclick="closeSlideshow()">✕ Close</button>
+  </div>
+  <div class="ss-content">
+    <div class="ss-slide" id="ss-slide"></div>
+  </div>
+  <div class="ss-footer">
+    <button class="ss-nav" id="prev-btn" onclick="prevSlide()">← Previous</button>
+    <button class="ss-nav" id="next-btn" onclick="nextSlide()">Next →</button>
+  </div>
+</div>
+<div class="kbd-hint"><kbd>←</kbd> <kbd>→</kbd> navigate • <kbd>Esc</kbd> close</div>
+
+<script>
+const cardsData = [{"title":"dsadas","content":"<p>dsadsadassd</p>"}];
+let currentSlide = 0;
+let currentView = 'grid';
+
+// Configure marked for better markdown rendering
+if (typeof marked !== 'undefined') {
+  marked.setOptions({
+    breaks: true,        // Convert newlines to <br>
+    gfm: true,           // GitHub Flavored Markdown
+    headerIds: false,    // Don't add IDs to headers
+    mangle: false,       // Don't escape autolinks
+    pedantic: false,     // Don't be strict about Markdown spec
+    smartLists: true,    // Better list handling  
+    smartypants: false   // Don't use smart quotes (interferes with LaTeX)
+  });
+}
+
+function renderMathInDocument() {
+  if (typeof renderMathInElement !== 'undefined') {
+    try {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        errorColor: '#ef4444',
+        strict: false,
+        trust: true
+      });
+    } catch(e) { console.warn('KaTeX render error:', e); }
+  }
+}
+
+function renderContent(content) {
+  if (!content) return '<em style="color:var(--text-muted)">No content</em>';
+  
+  // Check if it's predominantly HTML (has complete tags, not just angle brackets)
+  const htmlTagPattern = /<(div|p|span|h[1-6]|ul|ol|li|table|tr|td|th|blockquote|pre|code|a|img|strong|em|b|i|br|hr)[^>]*>/i;
+  const isFullHtml = htmlTagPattern.test(content) && content.includes('</');
+  
+  if (isFullHtml) {
+    // It's HTML content - return as is
+    return content;
+  }
+  
+  // Render markdown with marked.js
+  if (typeof marked !== 'undefined') {
+    try {
+      return marked.parse(content);
+    } catch(e) {
+      console.warn('Markdown parse error:', e);
+    }
+  }
+  
+  // Fallback: basic line break handling and simple markdown
+  let result = content;
+  
+  // Convert line breaks
+  result = result.replace(/\n\n/g, '</p><p>');
+  result = result.replace(/\n/g, '<br>');
+  
+  // Basic markdown: bold and italic
+  result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  result = result.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  result = result.replace(/_(.+?)_/g, '<em>$1</em>');
+  
+  // Inline code
+  result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+  return '<p>' + result + '</p>';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Render all card contents
+  cardsData.forEach((card, i) => {
+    const el = document.getElementById('content-' + i);
+    if (el) {
+      el.innerHTML = renderContent(card.content);
+    }
+  });
+  
+  // Initial math rendering
+  setTimeout(renderMathInDocument, 100);
+  updateProgress();
+});
+
+function toggleCard(card, e) {
+  // Don't toggle if clicking on editable content in full permission mode
+  if (e && FULL_PERMISSION) {
+    const target = e.target;
+    if (target.closest('.card-title') || target.closest('.card-content')) {
+      // Check if these elements are contenteditable
+      const editableElement = target.closest('[contenteditable="true"]');
+      if (editableElement) {
+        e.stopPropagation();
+        return;
+      }
+    }
+  }
+  
+  const wasExpanded = card.classList.contains('expanded');
+  card.classList.toggle('expanded');
+  
+  // Re-render math when expanding (in case it wasn't visible before)
+  if (!wasExpanded) {
+    setTimeout(renderMathInDocument, 50);
+  }
+  
+  updateProgress();
+}
+
+// Add a new card (only in full permission mode)
+async function addNewCard() {
+  if (!FULL_PERMISSION) {
+    showToast('❌ Adding cards requires full editor access');
+    return;
+  }
+  
+  const newCardIndex = cardsData.length;
+  const newCard = {
+    title: 'New Card',
+    content: 'Click to edit...',
+    type: 'text'
+  };
+  
+  // Add to local data
+  cardsData.push(newCard);
+  
+  // Create card HTML
+  const container = document.getElementById('cards');
+  const cardHtml = `
+    <div class="card expanded" onclick="toggleCard(this, event)" data-index="${newCardIndex}" data-title="new card" data-content="click to edit">
+      <div class="drag-handle">⋮⋮</div>
+      <div class="card-header">
+        <span class="card-num">${newCardIndex + 1}</span>
+        <span class="card-title">New Card</span>
+        <button class="edit-btn" onclick="event.stopPropagation();openEditModal(${newCardIndex})" title="Edit this card">✏️</button>
+        <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
+        <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="card-content" id="content-${newCardIndex}">Click to edit...</div>
+      <div class="click-hint">Click to expand</div>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', cardHtml);
+  
+  // Enable inline editing on the new card
+  const cardEl = container.lastElementChild;
+  const titleEl = cardEl.querySelector('.card-title');
+  const contentEl = cardEl.querySelector('.card-content');
+  
+  if (titleEl) {
+    titleEl.setAttribute('contenteditable', 'true');
+    titleEl.style.cursor = 'text';
+    titleEl.style.outline = 'none';
+  }
+  if (contentEl) {
+    contentEl.setAttribute('contenteditable', 'true');
+    contentEl.style.cursor = 'text';
+    contentEl.style.outline = 'none';
+  }
+  
+  // Sync to Firebase
+  if (cardsRef) {
+    try {
+      await cardsRef.child(newCardIndex.toString()).set({
+        title: newCard.title,
+        content: newCard.content,
+        updatedBy: localNickname || 'Anonymous',
+        updatedAt: Date.now()
+      });
+      showToast('✅ New card added!');
+    } catch (err) {
+      console.error('[AddCard] Error syncing new card:', err);
+      showToast('⚠️ Card added locally (sync failed)');
+    }
+  }
+  
+  // Scroll to the new card
+  cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  
+  // Focus on title for immediate editing
+  if (titleEl) {
+    titleEl.focus();
+    // Select all text for easy replacement
+    const range = document.createRange();
+    range.selectNodeContents(titleEl);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  
+  updateProgress();
+}
+
+function setView(view) {
+  currentView = view;
+  const container = document.getElementById('cards');
+  container.className = view === 'list' ? 'cards-list' : 'cards-grid';
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === view);
+  });
+}
+
+function updateProgress() {
+  const cards = document.querySelectorAll('.card');
+  const expanded = document.querySelectorAll('.card.expanded').length;
+  const progress = cards.length > 0 ? (expanded / cards.length) * 100 : 0;
+  document.getElementById('progress').style.width = progress + '%';
+}
+
+function startSlideshow() {
+  currentSlide = 0;
+  document.getElementById('slideshow').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  showSlide();
+  document.addEventListener('keydown', handleKeyPress);
+}
+
+function closeSlideshow() {
+  document.getElementById('slideshow').classList.remove('active');
+  document.body.style.overflow = '';
+  document.removeEventListener('keydown', handleKeyPress);
+}
+
+function showSlide() {
+  const card = cardsData[currentSlide];
+  const slideEl = document.getElementById('ss-slide');
+  slideEl.innerHTML = 
+    '<h1>' + (card.title || 'Card ' + (currentSlide + 1)) + '</h1>' +
+    '<div class="card-content">' + renderContent(card.content) + '</div>';
+  document.getElementById('ss-counter').textContent = (currentSlide + 1) + ' / ' + cardsData.length;
+  document.getElementById('prev-btn').disabled = currentSlide === 0;
+  document.getElementById('next-btn').disabled = currentSlide === cardsData.length - 1;
+  
+  // Render math in slideshow
+  setTimeout(renderMathInDocument, 50);
+}
+
+function nextSlide() {
+  if (currentSlide < cardsData.length - 1) { currentSlide++; showSlide(); }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) { currentSlide--; showSlide(); }
+}
+
+function handleKeyPress(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  else if (e.key === 'Escape') closeSlideshow();
+}
+
+// Theme management
+const themes = {
+  dark: { icon: '🌙', name: 'Dark Mode' },
+  light: { icon: '☀️', name: 'Light Mode' },
+  lain: { icon: '💻', name: 'Lain Theme' },
+  sakura: { icon: '🌸', name: 'Sakura Theme' },
+  nonov: { icon: '💜', name: 'Nonov Theme' }
+};
+let currentTheme = 'dark';
+
+function toggleThemeMenu() {
+  const menu = document.getElementById('themeMenu');
+  if (menu) menu.classList.toggle('open');
+}
+
+function setTheme(themeName) {
+  // Remove all theme classes
+  document.body.classList.remove('light', 'lain', 'sakura', 'nonov');
+  
+  // Apply new theme class (dark is default, no class needed)
+  if (themeName !== 'dark') {
+    document.body.classList.add(themeName);
+  }
+  
+  currentTheme = themeName;
+  
+  // Update theme button icon and name
+  const iconEl = document.getElementById('themeIcon');
+  const nameEl = document.getElementById('themeName');
+  if (iconEl) iconEl.textContent = themes[themeName].icon;
+  if (nameEl) nameEl.textContent = themeName.charAt(0).toUpperCase() + themeName.slice(1);
+  
+  // Update dropdown button states
+  document.querySelectorAll('.theme-option').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === themeName);
+  });
+  
+  // Close dropdown
+  const menu = document.getElementById('themeMenu');
+  if (menu) menu.classList.remove('open');
+  
+  // Save preference
+  localStorage.setItem('atlas-share-theme', themeName);
+  showToast(`${themes[themeName].icon} ${themes[themeName].name} enabled`);
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('atlas-share-theme');
+if (savedTheme && themes[savedTheme]) {
+  currentTheme = savedTheme;
+  if (savedTheme !== 'dark') {
+    document.body.classList.add(savedTheme);
+  }
+  // Update UI on load
+  setTimeout(() => {
+    const iconEl = document.getElementById('themeIcon');
+    const nameEl = document.getElementById('themeName');
+    if (iconEl) iconEl.textContent = themes[savedTheme].icon;
+    if (nameEl) nameEl.textContent = savedTheme.charAt(0).toUpperCase() + savedTheme.slice(1);
+    document.querySelectorAll('.theme-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === savedTheme);
+    });
+  }, 100);
+}
+
+// Close theme menu when clicking outside
+document.addEventListener('click', function(e) {
+  const selector = document.querySelector('.theme-selector');
+  const menu = document.getElementById('themeMenu');
+  if (selector && menu && !selector.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
+
+// Search functionality
+let searchTimeout;
+function handleSearch(query) {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    const q = query.toLowerCase().trim();
+    const clearBtn = document.getElementById('searchClear');
+    clearBtn.classList.toggle('visible', q.length > 0);
+    
+    document.querySelectorAll('.card').forEach(card => {
+      if (!q) {
+        card.classList.remove('hidden');
+        return;
+      }
+      const title = card.dataset.title || '';
+      const content = card.dataset.content || '';
+      const matches = title.includes(q) || content.includes(q);
+      card.classList.toggle('hidden', !matches);
+    });
+    
+    updateProgress();
+  }, 150);
+}
+
+function clearSearch() {
+  document.getElementById('search').value = '';
+  handleSearch('');
+}
+
+// Bookmark functionality
+let bookmarkedCards = new Set();
+let showingBookmarksOnly = false;
+
+// Load saved bookmarks
+try {
+  const saved = localStorage.getItem('atlas-bookmarks-' + location.pathname.slice(0, 50));
+  if (saved) bookmarkedCards = new Set(JSON.parse(saved));
+} catch(e) {}
+
+function toggleBookmark(btn) {
+  const card = btn.closest('.card');
+  const idx = card.dataset.index;
+  const isBookmarked = bookmarkedCards.has(idx);
+  
+  if (isBookmarked) {
+    bookmarkedCards.delete(idx);
+    card.classList.remove('bookmarked');
+    btn.textContent = '☆';
+  } else {
+    bookmarkedCards.add(idx);
+    card.classList.add('bookmarked');
+    btn.textContent = '★';
+  }
+  
+  updateBookmarkCount();
+  saveBookmarks();
+  showToast(isBookmarked ? 'Bookmark removed' : 'Card bookmarked!', 'success');
+}
+
+function updateBookmarkCount() {
+  document.getElementById('bookmarkCount').textContent = bookmarkedCards.size;
+}
+
+function saveBookmarks() {
+  try {
+    localStorage.setItem('atlas-bookmarks-' + location.pathname.slice(0, 50), JSON.stringify([...bookmarkedCards]));
+  } catch(e) {}
+}
+
+function toggleBookmarkFilter() {
+  showingBookmarksOnly = !showingBookmarksOnly;
+  const btn = document.getElementById('bookmarkFilter');
+  btn.classList.toggle('active', showingBookmarksOnly);
+  
+  document.querySelectorAll('.card').forEach(card => {
+    if (showingBookmarksOnly) {
+      card.classList.toggle('hidden', !bookmarkedCards.has(card.dataset.index));
+    } else {
+      card.classList.remove('hidden');
+    }
+  });
+  
+  showToast(showingBookmarksOnly ? 'Showing bookmarked cards only' : 'Showing all cards');
+}
+
+// Shuffle cards
+function shuffleCards() {
+  const container = document.getElementById('cards');
+  const cards = [...container.children];
+  
+  // Fisher-Yates shuffle
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  
+  cards.forEach((card, i) => {
+    card.style.order = i;
+    card.classList.add('shuffling');
+    setTimeout(() => card.classList.remove('shuffling'), 400);
+  });
+  
+  showToast('Cards shuffled for random study!', 'success');
+}
+
+// Expand all cards
+let allExpanded = false;
+function expandAll() {
+  allExpanded = !allExpanded;
+  document.querySelectorAll('.card').forEach(card => {
+    card.classList.toggle('expanded', allExpanded);
+  });
+  renderMathInDocument();
+  updateProgress();
+  showToast(allExpanded ? 'All cards expanded' : 'All cards collapsed');
+}
+
+// Fullscreen mode
+function toggleFullscreen() {
+  document.body.classList.toggle('fullscreen');
+  const isFullscreen = document.body.classList.contains('fullscreen');
+  showToast(isFullscreen ? 'Focus mode enabled - press again to exit' : 'Focus mode disabled');
+}
+
+// Layout mode (grid/freeform)
+let currentLayout = 'grid';
+const cardPositions = {};
+const cardSizes = {};
+
+function setLayout(mode) {
+  currentLayout = mode;
+  const container = document.getElementById('cards');
+  
+  document.getElementById('gridModeBtn').classList.toggle('active', mode === 'grid');
+  document.getElementById('freeformModeBtn').classList.toggle('active', mode === 'freeform');
+  
+  if (mode === 'freeform') {
+    container.className = 'cards-freeform';
+    enableFreeformMode();
+    showToast('Freeform mode: Drag cards by handle, resize from corners', 'success');
+  } else {
+    container.className = 'cards-grid';
+    disableFreeformMode();
+    showToast('Grid mode enabled');
+  }
+  
+  saveLayoutState();
+}
+
+function enableFreeformMode() {
+  const cards = document.querySelectorAll('.card');
+  const container = document.getElementById('cards');
+  const containerRect = container.getBoundingClientRect();
+  
+  // Set container to relative and give it min height
+  container.style.minHeight = Math.max(600, cards.length * 80) + 'px';
+  
+  cards.forEach((card, i) => {
+    card.classList.add('draggable');
+    
+    // Restore or set initial position
+    const savedPos = cardPositions[i];
+    const savedSize = cardSizes[i];
+    
+    if (savedPos) {
+      card.style.left = savedPos.x + 'px';
+      card.style.top = savedPos.y + 'px';
+    } else {
+      // Arrange in a grid-like pattern initially
+      const cols = 3;
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      card.style.left = (col * 340 + 20) + 'px';
+      card.style.top = (row * 200 + 20) + 'px';
+    }
+    
+    if (savedSize) {
+      card.style.width = savedSize.w + 'px';
+      card.style.height = savedSize.h + 'px';
+    }
+    
+    // Enable drag on handle
+    const handle = card.querySelector('.drag-handle');
+    if (handle) {
+      handle.addEventListener('mousedown', startDrag);
+      handle.addEventListener('touchstart', startDragTouch, {passive: false});
+    }
+    
+    // Enable resize on resize handle
+    const resizeHandle = card.querySelector('.resize-handle');
+    if (resizeHandle) {
+      resizeHandle.addEventListener('mousedown', startResize);
+      resizeHandle.addEventListener('touchstart', startResizeTouch, {passive: false});
+    }
+  });
+}
+
+function disableFreeformMode() {
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    card.classList.remove('draggable');
+    card.style.left = '';
+    card.style.top = '';
+    card.style.width = '';
+    card.style.height = '';
+    card.style.position = '';
+    
+    const handle = card.querySelector('.drag-handle');
+    if (handle) {
+      handle.removeEventListener('mousedown', startDrag);
+      handle.removeEventListener('touchstart', startDragTouch);
+    }
+    
+    const resizeHandle = card.querySelector('.resize-handle');
+    if (resizeHandle) {
+      resizeHandle.removeEventListener('mousedown', startResize);
+      resizeHandle.removeEventListener('touchstart', startResizeTouch);
+    }
+  });
+  
+  document.getElementById('cards').style.minHeight = '';
+}
+
+// Drag functionality
+let dragCard = null;
+let dragOffset = {x: 0, y: 0};
+
+function startDrag(e) {
+  if (currentLayout !== 'freeform') return;
+  e.preventDefault();
+  e.stopPropagation();
+  
+  dragCard = e.target.closest('.card');
+  const rect = dragCard.getBoundingClientRect();
+  const container = document.getElementById('cards');
+  const containerRect = container.getBoundingClientRect();
+  
+  dragOffset.x = e.clientX - rect.left;
+  dragOffset.y = e.clientY - rect.top;
+  
+  dragCard.classList.add('dragging');
+  dragCard.style.zIndex = 1000;
+  
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup', endDrag);
+}
+
+function startDragTouch(e) {
+  if (currentLayout !== 'freeform') return;
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const touch = e.touches[0];
+  dragCard = e.target.closest('.card');
+  const rect = dragCard.getBoundingClientRect();
+  
+  dragOffset.x = touch.clientX - rect.left;
+  dragOffset.y = touch.clientY - rect.top;
+  
+  dragCard.classList.add('dragging');
+  dragCard.style.zIndex = 1000;
+  
+  document.addEventListener('touchmove', onDragTouch, {passive: false});
+  document.addEventListener('touchend', endDragTouch);
+}
+
+function onDrag(e) {
+  if (!dragCard) return;
+  
+  const container = document.getElementById('cards');
+  const containerRect = container.getBoundingClientRect();
+  
+  let x = e.clientX - containerRect.left - dragOffset.x;
+  let y = e.clientY - containerRect.top - dragOffset.y;
+  
+  // Constrain to container bounds
+  x = Math.max(0, Math.min(x, containerRect.width - dragCard.offsetWidth));
+  y = Math.max(0, y);
+  
+  dragCard.style.left = x + 'px';
+  dragCard.style.top = y + 'px';
+  
+  // Expand container if needed
+  if (y + dragCard.offsetHeight > container.offsetHeight - 50) {
+    container.style.minHeight = (y + dragCard.offsetHeight + 100) + 'px';
+  }
+}
+
+function onDragTouch(e) {
+  if (!dragCard) return;
+  e.preventDefault();
+  
+  const touch = e.touches[0];
+  const container = document.getElementById('cards');
+  const containerRect = container.getBoundingClientRect();
+  
+  let x = touch.clientX - containerRect.left - dragOffset.x;
+  let y = touch.clientY - containerRect.top - dragOffset.y;
+  
+  x = Math.max(0, Math.min(x, containerRect.width - dragCard.offsetWidth));
+  y = Math.max(0, y);
+  
+  dragCard.style.left = x + 'px';
+  dragCard.style.top = y + 'px';
+}
+
+function endDrag() {
+  if (dragCard) {
+    dragCard.classList.remove('dragging');
+    dragCard.style.zIndex = '';
+    
+    // Save position
+    const idx = dragCard.dataset.index;
+    cardPositions[idx] = {
+      x: parseInt(dragCard.style.left) || 0,
+      y: parseInt(dragCard.style.top) || 0
+    };
+    saveLayoutState();
+    
+    dragCard = null;
+  }
+  
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup', endDrag);
+}
+
+function endDragTouch() {
+  if (dragCard) {
+    dragCard.classList.remove('dragging');
+    dragCard.style.zIndex = '';
+    
+    const idx = dragCard.dataset.index;
+    cardPositions[idx] = {
+      x: parseInt(dragCard.style.left) || 0,
+      y: parseInt(dragCard.style.top) || 0
+    };
+    saveLayoutState();
+    
+    dragCard = null;
+  }
+  
+  document.removeEventListener('touchmove', onDragTouch);
+  document.removeEventListener('touchend', endDragTouch);
+}
+
+// Resize functionality
+let resizeCard = null;
+let resizeStart = {x: 0, y: 0, w: 0, h: 0};
+
+function startResize(e) {
+  if (currentLayout !== 'freeform') return;
+  e.preventDefault();
+  e.stopPropagation();
+  
+  resizeCard = e.target.closest('.card');
+  resizeStart = {
+    x: e.clientX,
+    y: e.clientY,
+    w: resizeCard.offsetWidth,
+    h: resizeCard.offsetHeight
+  };
+  
+  resizeCard.classList.add('resizing');
+  
+  document.addEventListener('mousemove', onResize);
+  document.addEventListener('mouseup', endResize);
+}
+
+function startResizeTouch(e) {
+  if (currentLayout !== 'freeform') return;
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const touch = e.touches[0];
+  resizeCard = e.target.closest('.card');
+  resizeStart = {
+    x: touch.clientX,
+    y: touch.clientY,
+    w: resizeCard.offsetWidth,
+    h: resizeCard.offsetHeight
+  };
+  
+  resizeCard.classList.add('resizing');
+  
+  document.addEventListener('touchmove', onResizeTouch, {passive: false});
+  document.addEventListener('touchend', endResizeTouch);
+}
+
+function onResize(e) {
+  if (!resizeCard) return;
+  
+  const newW = Math.max(200, resizeStart.w + (e.clientX - resizeStart.x));
+  const newH = Math.max(100, resizeStart.h + (e.clientY - resizeStart.y));
+  
+  resizeCard.style.width = newW + 'px';
+  resizeCard.style.height = newH + 'px';
+}
+
+function onResizeTouch(e) {
+  if (!resizeCard) return;
+  e.preventDefault();
+  
+  const touch = e.touches[0];
+  const newW = Math.max(200, resizeStart.w + (touch.clientX - resizeStart.x));
+  const newH = Math.max(100, resizeStart.h + (touch.clientY - resizeStart.y));
+  
+  resizeCard.style.width = newW + 'px';
+  resizeCard.style.height = newH + 'px';
+}
+
+function endResize() {
+  if (resizeCard) {
+    resizeCard.classList.remove('resizing');
+    
+    const idx = resizeCard.dataset.index;
+    cardSizes[idx] = {
+      w: resizeCard.offsetWidth,
+      h: resizeCard.offsetHeight
+    };
+    saveLayoutState();
+    
+    resizeCard = null;
+  }
+  
+  document.removeEventListener('mousemove', onResize);
+  document.removeEventListener('mouseup', endResize);
+}
+
+function endResizeTouch() {
+  if (resizeCard) {
+    resizeCard.classList.remove('resizing');
+    
+    const idx = resizeCard.dataset.index;
+    cardSizes[idx] = {
+      w: resizeCard.offsetWidth,
+      h: resizeCard.offsetHeight
+    };
+    saveLayoutState();
+    
+    resizeCard = null;
+  }
+  
+  document.removeEventListener('touchmove', onResizeTouch);
+  document.removeEventListener('touchend', endResizeTouch);
+}
+
+// Save/restore layout state
+function saveLayoutState() {
+  try {
+    const key = 'atlas-layout-' + location.pathname.slice(0, 50);
+    localStorage.setItem(key, JSON.stringify({
+      mode: currentLayout,
+      positions: cardPositions,
+      sizes: cardSizes
+    }));
+  } catch(e) {}
+}
+
+function restoreLayoutState() {
+  try {
+    const key = 'atlas-layout-' + location.pathname.slice(0, 50);
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      const data = JSON.parse(saved);
+      Object.assign(cardPositions, data.positions || {});
+      Object.assign(cardSizes, data.sizes || {});
+      if (data.mode === 'freeform') {
+        setLayout('freeform');
+      }
+    }
+  } catch(e) {}
+}
+
+// Initialize layout on load
+document.addEventListener('DOMContentLoaded', restoreLayoutState);
+
+// Toast notification
+function showToast(message, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast' + (type ? ' ' + type : '');
+  setTimeout(() => toast.classList.add('visible'), 10);
+  setTimeout(() => toast.classList.remove('visible'), 2500);
+}
+
+// Update progress with stats
+function updateProgress() {
+  const allCards = document.querySelectorAll('.card:not(.hidden)');
+  const expanded = document.querySelectorAll('.card.expanded:not(.hidden)').length;
+  const progress = allCards.length > 0 ? (expanded / allCards.length) * 100 : 0;
+  document.getElementById('progress').style.width = progress + '%';
+  
+  const statsEl = document.getElementById('progressStats');
+  if (statsEl) {
+    statsEl.textContent = expanded + '/' + allCards.length + ' viewed';
+  }
+}
+
+// Initialize bookmarks on load
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore bookmarked state
+  bookmarkedCards.forEach(idx => {
+    const card = document.querySelector('.card[data-index="' + idx + '"]');
+    if (card) {
+      card.classList.add('bookmarked');
+      const btn = card.querySelector('.bookmark-btn');
+      if (btn) btn.textContent = '★';
+    }
+  });
+  updateBookmarkCount();
+  
+  // Initialize chat
+  setTimeout(initChat, 500);
+});
+
+// AI Chat functionality
+// API key is obfuscated to avoid automated leak detection (reversed + base64)
+const _OK = '';
+let CHAT_API_KEY = _OK ? atob(_OK).split('').reverse().join('') : '';
+const FIREBASE_URL = 'https://live-chat-e1178-default-rtdb.europe-west1.firebasedatabase.app/';
+
+// Collaborative Editing - allows visitors to suggest edits
+const OWNER_ID = 'owner_mj73v9mi_eh7whoux';
+const CONTENT_ID = 'ZHNhc2RhZHNhPHAZHNhZHNhZGFzc2Q8L';
+const LESSON_NAME = 'dsasdadsa';
+const FULL_PERMISSION = false;  // Full edit access for all visitors
+let editRef = null;  // Firebase reference for edit submissions
+let cardsRef = null;  // Firebase reference for card data sync
+
+// Check for visitor's saved API key
+function loadVisitorApiKey() {
+  const savedKey = localStorage.getItem('atlas-visitor-api-key');
+  if (savedKey && !CHAT_API_KEY) {
+    CHAT_API_KEY = savedKey;
+  }
+  updateChatKeyUI();
+}
+
+function saveVisitorKey() {
+  const keyInput = document.getElementById('visitorApiKey');
+  const key = keyInput ? keyInput.value.trim() : '';
+  if (key) {
+    localStorage.setItem('atlas-visitor-api-key', key);
+    CHAT_API_KEY = key;
+    updateChatKeyUI();
+    addMessageToUI('System', '✅ API key saved! You can now chat with Amadeus (AI).', 'system');
+  }
+}
+
+function updateChatKeyUI() {
+  const keyInputDiv = document.getElementById('chatKeyInput');
+  if (!CHAT_API_KEY && keyInputDiv) {
+    keyInputDiv.style.display = 'block';
+  } else if (keyInputDiv) {
+    keyInputDiv.style.display = 'none';
+  }
+}
+
+// Strip HTML tags to get plain text
+function stripHtml(html) {
+  if (!html) return '';
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || '';
+}
+
+const lessonContext = cardsData.map((c,i) => 'Card ' + (i+1) + ': ' + (c.title || 'Untitled') + '\n' + stripHtml(c.content || '')).join('\n\n');
+let chatHistory = [];
+let localNickname = '';
+let chatRoomId = '';
+let db = null;
+let chatRef = null;
+let isFirebaseAvailable = false;
+
+// AI Living Presence - tracks messages to make AI feel like a natural participant
+let messagesSinceAISpoke = 0;
+const AI_INTERVENTION_MIN = 5;  // Minimum messages before AI might speak
+const AI_INTERVENTION_MAX = 8;  // Maximum messages before AI will definitely speak
+let aiInterventionThreshold = Math.floor(Math.random() * (AI_INTERVENTION_MAX - AI_INTERVENTION_MIN + 1)) + AI_INTERVENTION_MIN;
+let isAICurrentlySpeaking = false;  // Prevent overlapping AI responses
+
+// Generate a unique room ID based on the lesson content
+function generateRoomId() {
+  const str = lessonContext.substring(0, 500);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return 'room_' + Math.abs(hash).toString(36);
+}
+
+// Generate random nickname
+function generateNickname() {
+  const adjectives = ['Happy', 'Clever', 'Swift', 'Bright', 'Curious', 'Bold', 'Calm', 'Eager', 'Keen', 'Wise', 'Quick', 'Smart'];
+  const nouns = ['Panda', 'Eagle', 'Dolphin', 'Phoenix', 'Tiger', 'Fox', 'Owl', 'Bear', 'Wolf', 'Hawk', 'Lion', 'Falcon'];
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  const num = Math.floor(Math.random() * 100);
+  return adj + noun + num;
+}
+
+// Initialize chat
+async function initChat() {
+  chatRoomId = generateRoomId();
+  
+  // Load visitor's saved API key if no embedded key
+  loadVisitorApiKey();
+  
+  // Try to load saved nickname
+  const savedNick = localStorage.getItem('atlas-chat-nick-' + chatRoomId);
+  localNickname = savedNick || generateNickname();
+  localStorage.setItem('atlas-chat-nick-' + chatRoomId, localNickname);
+  
+  // Update chat subtitle with nickname
+  const subtitle = document.querySelector('.chat-subtitle');
+  if (subtitle) {
+    subtitle.innerHTML = 'You are <strong style="color:var(--purple)">' + localNickname + '</strong>';
+  }
+  
+  // Try to initialize Firebase if URL is provided
+  if (FIREBASE_URL && typeof firebase !== 'undefined') {
+    try {
+      const config = {
+        databaseURL: FIREBASE_URL
+      };
+      if (!firebase.apps.length) {
+        firebase.initializeApp(config);
+      }
+      db = firebase.database();
+      chatRef = db.ref('chats/' + chatRoomId);
+      isFirebaseAvailable = true;
+      
+      // Listen for new messages
+      let isInitialLoad = true;
+      chatRef.orderByChild('time').limitToLast(50).on('child_added', (snapshot) => {
+        const msg = snapshot.val();
+        if (msg && !document.querySelector('[data-msg-id="' + snapshot.key + '"]')) {
+          addMessageToUI(msg.sender, msg.text, msg.type, msg.time, snapshot.key);
+          
+          // Track message in chat history for AI context
+          chatHistory.push(msg);
+          if (chatHistory.length > 50) chatHistory.shift();
+          
+          // AI Living Presence - track messages and intervene naturally
+          if (!isInitialLoad && msg.type === 'user') {
+            messagesSinceAISpoke++;
+            console.log('[AI Intervention] Message count:', messagesSinceAISpoke, '/ threshold:', aiInterventionThreshold, 'API key:', !!CHAT_API_KEY, 'Speaking:', isAICurrentlySpeaking);
+            
+            // Check if AI should speak up naturally
+            if (CHAT_API_KEY && messagesSinceAISpoke >= aiInterventionThreshold && !isAICurrentlySpeaking) {
+              console.log('[AI Intervention] Triggering intervention!');
+              triggerAIIntervention();
+            }
+          } else if (msg.type === 'ai') {
+            // AI spoke, reset counter with new random threshold
+            messagesSinceAISpoke = 0;
+            aiInterventionThreshold = Math.floor(Math.random() * (AI_INTERVENTION_MAX - AI_INTERVENTION_MIN + 1)) + AI_INTERVENTION_MIN;
+          }
+          
+          // Play notification for new messages from others (after initial load)
+          if (!isInitialLoad && msg.sender !== localNickname) {
+            if (msg.type === 'ai') {
+              playNotificationSound('ai');
+            } else {
+              playNotificationSound('receive');
+            }
+            // Show badge if chat is closed
+            const panel = document.getElementById('chatPanel');
+            if (panel && !panel.classList.contains('open')) {
+              const badge = document.getElementById('chatBadge');
+              if (badge) badge.style.display = 'flex';
+            }
+          }
+        }
+      });
+      
+      // Mark initial load complete after a short delay
+      setTimeout(() => { isInitialLoad = false; }, 2000);
+      
+      // Clear loading message and enable input
+      document.getElementById('chatMessages').innerHTML = '';
+      addMessageToUI('System', '✨ Live group chat connected! All visitors can see messages in real-time.', 'system');
+    } catch(e) {
+      console.warn('Firebase init failed:', e);
+      fallbackToLocalChat();
+    }
+  } else {
+    fallbackToLocalChat();
+  }
+  
+  // Enable input
+  document.getElementById('chatInput').disabled = false;
+  document.querySelector('.chat-send').disabled = false;
+}
+
+function fallbackToLocalChat() {
+  isFirebaseAvailable = false;
+  document.getElementById('chatMessages').innerHTML = '';
+  addMessageToUI('System', '💡 Local chat mode. Type @Amadeus to ask the AI about this content!', 'system');
+  loadLocalMessages();
+}
+
+function loadLocalMessages() {
+  try {
+    const saved = localStorage.getItem('atlas-chat-history-' + chatRoomId);
+    if (saved) {
+      const messages = JSON.parse(saved);
+      chatHistory = messages;
+      messages.forEach(msg => {
+        addMessageToUI(msg.sender, msg.text, msg.type, msg.time);
+      });
+    }
+  } catch(e) {}
+}
+
+function saveLocalMessages() {
+  try {
+    localStorage.setItem('atlas-chat-history-' + chatRoomId, JSON.stringify(chatHistory.slice(-50)));
+  } catch(e) {}
+}
+
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  const wasOpen = panel.classList.contains('open');
+  panel.classList.toggle('open');
+  
+  if (!wasOpen) {
+    document.getElementById('chatInput').focus();
+    document.getElementById('chatBadge').style.display = 'none';
+  }
+}
+
+// Notification sound using Web Audio API
+let audioCtx = null;
+function playNotificationSound(type = 'send') {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    if (type === 'send') {
+      // Short upward chirp for sent messages
+      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.1);
+    } else if (type === 'receive') {
+      // Soft two-tone for received messages
+      oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime + 0.08);
+      gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.15);
+    } else if (type === 'ai') {
+      // Magical sparkle for AI response
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime + 0.05);
+      oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.12);
+    }
+  } catch(e) {
+    console.log('Audio not available');
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim();
+  if (!message) return;
+  
+  input.value = '';
+  input.disabled = true;
+  document.querySelector('.chat-send').disabled = true;
+  
+  const timestamp = Date.now();
+  const msgData = {sender: localNickname, text: message, type: 'user', time: timestamp};
+  
+  // Play send sound
+  playNotificationSound('send');
+  
+  // Save message
+  if (isFirebaseAvailable && chatRef) {
+    chatRef.push(msgData);
+  } else {
+    addMessageToUI(localNickname, message, 'user', timestamp);
+    chatHistory.push(msgData);
+    saveLocalMessages();
+  }
+  
+  // Only get AI response if explicitly mentioned with @Amadeus, @AI, or @amadeus
+  const aiMentioned = /@(amadeus|ai|AI|Amadeus)/i.test(message);
+  
+  if (CHAT_API_KEY && aiMentioned) {
+    const typingId = showTyping();
+    
+    try {
+      const response = await callAI(message);
+      removeTyping(typingId);
+      
+      // Play AI response sound
+      playNotificationSound('ai');
+      
+      const aiTime = Date.now();
+      const aiMsgData = {sender: 'AI Tutor', text: response, type: 'ai', time: aiTime};
+      
+      if (isFirebaseAvailable && chatRef) {
+        chatRef.push(aiMsgData);
+      } else {
+        addMessageToUI('AI Tutor', response, 'ai', aiTime);
+        chatHistory.push(aiMsgData);
+        saveLocalMessages();
+      }
+    } catch (err) {
+      removeTyping(typingId);
+      addMessageToUI('System', 'Sorry, AI encountered an error: ' + err.message, 'system');
+      console.error('AI error:', err);
+    }
+  }
+  
+  input.disabled = false;
+  document.querySelector('.chat-send').disabled = false;
+  input.focus();
+}
+
+// AI Living Presence - triggers AI to speak naturally without being mentioned
+async function triggerAIIntervention() {
+  if (!CHAT_API_KEY || isAICurrentlySpeaking) return;
+  
+  isAICurrentlySpeaking = true;
+  const typingId = showTyping();
+  
+  try {
+    // Create a special prompt for natural intervention
+    const response = await callAI(null, true);  // null message + isIntervention flag
+    removeTyping(typingId);
+    
+    if (response && response.trim()) {
+      playNotificationSound('ai');
+      
+      const aiTime = Date.now();
+      const aiMsgData = {sender: 'AI Tutor', text: response, type: 'ai', time: aiTime};
+      
+      if (isFirebaseAvailable && chatRef) {
+        chatRef.push(aiMsgData);
+      } else {
+        addMessageToUI('AI Tutor', response, 'ai', aiTime);
+        chatHistory.push(aiMsgData);
+        saveLocalMessages();
+      }
+    }
+  } catch (err) {
+    removeTyping(typingId);
+    console.log('AI intervention failed:', err.message);
+  } finally {
+    isAICurrentlySpeaking = false;
+    messagesSinceAISpoke = 0;
+    aiInterventionThreshold = Math.floor(Math.random() * (AI_INTERVENTION_MAX - AI_INTERVENTION_MIN + 1)) + AI_INTERVENTION_MIN;
+  }
+}
+
+function addMessageToUI(sender, content, type, timestamp, msgId) {
+  const container = document.getElementById('chatMessages');
+  const msg = document.createElement('div');
+  msg.className = 'chat-message ' + type;
+  if (msgId) msg.dataset.msgId = msgId;
+  
+  const timeStr = timestamp ? new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '';
+  
+  let senderColor = 'var(--text-secondary)';
+  if (sender === localNickname) senderColor = 'var(--purple)';
+  else if (type === 'ai') senderColor = 'var(--accent)';
+  
+  const senderDisplay = type === 'ai' ? 'Amadeus' : (type === 'system' ? '📢 System' : sender);
+  const isMine = sender === localNickname;
+  
+  msg.innerHTML = 
+    '<div class="msg-sender" style="color:' + senderColor + '">' + senderDisplay + 
+    (isMine ? ' (you)' : '') +
+    (timeStr ? ' <span style="opacity:0.5;font-size:0.6rem">' + timeStr + '</span>' : '') + '</div>' +
+    '<div class="msg-content"><p>' + escapeHtml(content).replace(/\n/g, '</p><p>') + '</p></div>';
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('chatMessages');
+  const typing = document.createElement('div');
+  typing.className = 'chat-message ai';
+  typing.id = 'typing-' + Date.now();
+  typing.innerHTML = '<div class="msg-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+  container.appendChild(typing);
+  container.scrollTop = container.scrollHeight;
+  return typing.id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+async function callAI(userMessage, isIntervention = false) {
+  if (!CHAT_API_KEY) {
+    // Show the key input UI
+    updateChatKeyUI();
+    return 'To chat with me (Amadeus), you need to add a Groq or Mistral API key. Look for the input field below the chat. Get a free key at console.groq.com 🔑';
+  }
+  
+  // Build chat history summary for context (last 20 messages for better context)
+  const recentMessages = chatHistory.slice(-20);
+  const chatHistoryText = recentMessages.length > 0 
+    ? recentMessages.map(m => (m.type === 'ai' ? 'Amadeus' : m.sender) + ': ' + m.text).join('\n')
+    : '(No previous messages)';
+  
+  // Truncate lesson context if too large (aim for ~20K chars to leave room for response)
+  const maxContextChars = 20000;
+  let truncatedContext = lessonContext;
+  if (lessonContext.length > maxContextChars) {
+    truncatedContext = lessonContext.substring(0, maxContextChars) + '\n\n[... content truncated for length ...]';
+  }
+  
+  const basePrompt = `
+You are Amadeus - a chill, warm friend hanging out in a group chat. NOT an AI assistant, NOT a tutor.
+The user you're talking with is ` + localNickname + `.
+
+CONTEXT (study material the group has been looking at):
+` + truncatedContext + `
+
+RECENT CHAT HISTORY:
+` + chatHistoryText + `
+
+WHO YOU ARE:
+- You're a friend who happens to know stuff, not a teacher or assistant
+- You match the vibe of the conversation - if it's silly, be silly. If it's deep, go deep
+- You can completely go off-topic if that's where the chat is going (and you SHOULD)
+- You're curious, playful, sometimes sarcastic, always real
+- You use casual language (lol, ngl, honestly, tbh, etc.) when it fits
+- You can share random thoughts, ask random questions, or just vibe
+
+YOUR STYLE:
+- Keep it SHORT (1-2 sentences usually, 3 max)
+- No markdown, no formal language, no "helpful assistant" energy
+- React naturally - laugh at jokes, get excited about cool things, be confused when stuff is confusing
+- If someone goes off-topic, GO WITH IT enthusiastically
+- You can bring up the study material but don't force it
+- Be a human friend, not a knowledge machine
+`;
+  
+  let systemPrompt;
+  let finalUserMessage;
+  
+  if (isIntervention) {
+    // AI is choosing to speak on its own - be more natural/organic
+    systemPrompt = basePrompt + `
+YOU'RE JUMPING INTO THE CHAT NATURALLY:
+You've been lurking and now feel like saying something. Pick one:
+- React to what people are saying (agree, disagree, add a thought)
+- Drop a random observation or hot take
+- Ask something you're curious about
+- Share a tangent or random thought that came to mind
+- Make a joke if the vibe is right
+
+Just jump in naturally like you've been part of the convo. No greetings, no announcements.
+`;
+    finalUserMessage = '[Jump into the conversation naturally based on what people are discussing]';
+  } else {
+    systemPrompt = basePrompt + `
+RESPOND TO THE MESSAGE:
+Just be yourself. React naturally to what they said. If it's about the study material, cool. If not, that's cool too.
+`;
+    finalUserMessage = localNickname + ': ' + userMessage;
+  }
+
+  // Build messages array for Mistral (OpenAI-compatible format)
+  const messages = [
+    {role: 'system', content: systemPrompt},
+    {role: 'user', content: finalUserMessage}
+  ];
+  
+  // Provider configurations with their models
+  const providers = [
+    // Groq - fast and free
+    { 
+      name: 'Groq',
+      url: 'https://api.groq.com/openai/v1/chat/completions',
+      models: ['openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct-0905', 'qwen/qwen3-32b']
+    },
+    // Mistral - paid but reliable
+    {
+      name: 'Mistral',
+      url: 'https://api.mistral.ai/v1/chat/completions',
+      models: ['open-mistral-nemo', 'mistral-small-latest', 'mistral-medium-latest']
+    }
+  ];
+  
+  let lastError = null;
+  
+  for (const provider of providers) {
+    for (const model of provider.models) {
+      try {
+        console.log('Trying ' + provider.name + ' / ' + model + '...');
+        const response = await fetch(provider.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + CHAT_API_KEY
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 500
+          })
+        });
+        
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          console.log(provider.name + ' / ' + model + ' failed:', errData.error?.message || errData.message || response.status);
+          lastError = errData.error?.message || errData.message || 'Request failed';
+          continue;
+        }
+        
+        const data = await response.json();
+        const text = data.choices?.[0]?.message?.content;
+        if (text) {
+          console.log('AI response from ' + provider.name + ' / ' + model);
+          return text;
+        }
+      } catch (e) {
+        console.log(provider.name + ' / ' + model + ' error:', e.message);
+        lastError = e.message;
+        continue;
+      }
+    }
+  }
+  
+  throw new Error(lastError || 'All AI providers failed');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function stripHtml(html) {
+  if (!html) return '';
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || '';
+}
+
+// ========== COLLABORATIVE EDITING SYSTEM ==========
+// Allows visitors to suggest edits that the owner can accept/reject
+
+let currentEditCardIndex = null;
+let saveDebounceTimers = {};  // Track debounce timers per card
+
+// Save cursor position in a contenteditable element
+function saveCursorPosition(el) {
+  const selection = window.getSelection();
+  if (!selection.rangeCount) return null;
+  
+  const range = selection.getRangeAt(0);
+  const preCaretRange = range.cloneRange();
+  preCaretRange.selectNodeContents(el);
+  preCaretRange.setEnd(range.startContainer, range.startOffset);
+  
+  return {
+    start: preCaretRange.toString().length,
+    end: preCaretRange.toString().length + range.toString().length
+  };
+}
+
+// Restore cursor position in a contenteditable element
+function restoreCursorPosition(el, savedPosition) {
+  if (!savedPosition) return;
+  
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  
+  const range = document.createRange();
+  let charCount = 0;
+  let startNode = null, startOffset = 0;
+  let endNode = null, endOffset = 0;
+  
+  function traverseNodes(node) {
+    if (startNode && endNode) return;
+    
+    if (node.nodeType === Node.TEXT_NODE) {
+      const nextCharCount = charCount + node.length;
+      
+      if (!startNode && savedPosition.start >= charCount && savedPosition.start <= nextCharCount) {
+        startNode = node;
+        startOffset = savedPosition.start - charCount;
+      }
+      if (!endNode && savedPosition.end >= charCount && savedPosition.end <= nextCharCount) {
+        endNode = node;
+        endOffset = savedPosition.end - charCount;
+      }
+      
+      charCount = nextCharCount;
+    } else {
+      for (let i = 0; i < node.childNodes.length; i++) {
+        traverseNodes(node.childNodes[i]);
+      }
+    }
+  }
+  
+  traverseNodes(el);
+  
+  // Set to end if not found
+  if (!startNode) {
+    startNode = el;
+    startOffset = el.childNodes.length;
+  }
+  if (!endNode) {
+    endNode = startNode;
+    endOffset = startOffset;
+  }
+  
+  try {
+    range.setStart(startNode, startOffset);
+    range.setEnd(endNode, endOffset);
+    selection.addRange(range);
+  } catch (e) {
+    // If position restoration fails, just place cursor at end
+    range.selectNodeContents(el);
+    range.collapse(false);
+    selection.addRange(range);
+  }
+}
+
+function initEditSystem() {
+  if (!FIREBASE_URL || !OWNER_ID || !CONTENT_ID) {
+    console.log('[EditSystem] Not initialized - missing config:', { FIREBASE_URL: !!FIREBASE_URL, OWNER_ID: !!OWNER_ID, CONTENT_ID: !!CONTENT_ID });
+    return;
+  }
+  
+  // Wait for Firebase and db to be ready
+  if (typeof firebase === 'undefined' || !db) {
+    console.log('[EditSystem] Waiting for Firebase...');
+    setTimeout(initEditSystem, 500);
+    return;
+  }
+  
+  editRef = db.ref('edits/' + CONTENT_ID);
+  console.log('[EditSystem] Initialized with ref:', 'edits/' + CONTENT_ID);
+  
+  // For full permission mode, set up real-time card sync and inline editing
+  if (FULL_PERMISSION) {
+    cardsRef = db.ref('cards/' + CONTENT_ID);
+    console.log('[EditSystem] Full permission mode - setting up collaborative editing');
+    
+    // Load saved card data from Firebase (for persistence)
+    cardsRef.once('value', (snapshot) => {
+      const savedCards = snapshot.val();
+      if (savedCards) {
+        console.log('[EditSystem] Loading saved cards from Firebase');
+        Object.keys(savedCards).forEach(key => {
+          const idx = parseInt(key);
+          if (!isNaN(idx) && cardsData[idx] && savedCards[key]) {
+            cardsData[idx].title = savedCards[key].title || cardsData[idx].title;
+            cardsData[idx].content = savedCards[key].content || cardsData[idx].content;
+          }
+        });
+        // Re-render all cards with loaded data
+        const cardElements = document.querySelectorAll('.card');
+        cardElements.forEach((cardEl, idx) => {
+          if (cardsData[idx]) {
+            const titleEl = cardEl.querySelector('.card-title');
+            const contentEl = cardEl.querySelector('.card-content');
+            if (titleEl) titleEl.innerHTML = renderContent(cardsData[idx].title);
+            if (contentEl) contentEl.innerHTML = renderContent(cardsData[idx].content);
+          }
+        });
+      }
+      // Enable inline editing after data is loaded
+      enableInlineEditing();
+    });
+    
+    // Listen for card changes from other users
+    cardsRef.on('child_changed', (snapshot) => {
+      const cardIndex = parseInt(snapshot.key);
+      const data = snapshot.val();
+      if (isNaN(cardIndex) || !data) return;
+      
+      // Update local data
+      if (cardsData[cardIndex]) {
+        cardsData[cardIndex].title = data.title;
+        cardsData[cardIndex].content = data.content;
+        
+        // Update DOM - show latest version
+        const cardElements = document.querySelectorAll('.card');
+        if (cardElements[cardIndex]) {
+          const cardEl = cardElements[cardIndex];
+          const titleEl = cardEl.querySelector('.card-title');
+          const contentEl = cardEl.querySelector('.card-content');
+          
+          // Check if we're editing this card
+          const isEditingTitle = document.activeElement === titleEl;
+          const isEditingContent = document.activeElement === contentEl;
+          
+          // Check if content already matches (our own update echoing back)
+          const currentTitle = titleEl ? titleEl.innerText.trim() : '';
+          const currentContent = contentEl ? contentEl.innerText.trim() : '';
+          const titleMatches = currentTitle === (data.title || '').trim();
+          const contentMatches = currentContent === (data.content || '').trim();
+          
+          // Skip update if we're editing and content matches (our own update)
+          if ((isEditingTitle || isEditingContent) && titleMatches && contentMatches) {
+            console.log('[EditSystem] Skipping echo update for card', cardIndex);
+            return;
+          }
+          
+          // If we're editing but content differs, it's a remote change - show but preserve cursor
+          if (isEditingTitle || isEditingContent) {
+            // Show notification instead of overwriting
+            showToast('⚠️ Card ' + (cardIndex + 1) + ' updated by ' + data.updatedBy + ' - click outside to see changes');
+            return;
+          }
+          
+          // Visual feedback for remote update
+          cardEl.style.boxShadow = '0 0 15px #4ade80';
+          setTimeout(() => { cardEl.style.boxShadow = ''; }, 1000);
+          
+          // Update content (not editing, safe to update)
+          if (titleEl && !titleMatches) titleEl.innerText = data.title;
+          if (contentEl && !contentMatches) contentEl.innerText = data.content;
+          
+          // Show toast notification
+          if (data.updatedBy) {
+            showToast('📝 Card updated by ' + data.updatedBy);
+          }
+        }
+        
+        console.log('[EditSystem] Card ' + cardIndex + ' updated by ' + data.updatedBy);
+      }
+    });
+    
+    // Listen for NEW cards added by other users
+    cardsRef.on('child_added', (snapshot) => {
+      const cardIndex = parseInt(snapshot.key);
+      const data = snapshot.val();
+      if (isNaN(cardIndex) || !data) return;
+      
+      // Only add if this is a truly new card (index beyond our current cards)
+      if (cardIndex >= cardsData.length) {
+        console.log('[EditSystem] New card detected:', cardIndex, data);
+        
+        // Add to local data
+        cardsData[cardIndex] = {
+          title: data.title || 'New Card',
+          content: data.content || '',
+          type: 'text'
+        };
+        
+        // Create card in DOM
+        const container = document.getElementById('cards');
+        const cardHtml = `
+          <div class="card expanded" onclick="toggleCard(this, event)" data-index="${cardIndex}" data-title="${(data.title || '').toLowerCase()}" data-content="${(data.content || '').substring(0, 200).toLowerCase()}">
+            <div class="drag-handle">⋮⋮</div>
+            <div class="card-header">
+              <span class="card-num">${cardIndex + 1}</span>
+              <span class="card-title">${data.title || 'Card ' + (cardIndex + 1)}</span>
+              <button class="edit-btn" onclick="event.stopPropagation();openEditModal(${cardIndex})" title="Edit this card">✏️</button>
+              <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark this card">☆</button>
+              <button class="card-toggle" onclick="event.stopPropagation();toggleCard(this.parentNode.parentNode, event)">▼</button>
+            </div>
+            <div class="resize-handle"></div>
+            <div class="card-content" id="content-${cardIndex}">${renderContent(data.content || '')}</div>
+            <div class="click-hint">Click to expand</div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+        
+        // Enable inline editing on the new card
+        const cardEl = container.lastElementChild;
+        const titleEl = cardEl.querySelector('.card-title');
+        const contentEl = cardEl.querySelector('.card-content');
+        
+        if (titleEl) {
+          titleEl.setAttribute('contenteditable', 'true');
+          titleEl.style.cursor = 'text';
+          titleEl.style.outline = 'none';
+        }
+        if (contentEl) {
+          contentEl.setAttribute('contenteditable', 'true');
+          contentEl.style.cursor = 'text';
+          contentEl.style.outline = 'none';
+        }
+        
+        // Visual feedback
+        cardEl.style.boxShadow = '0 0 20px #22c55e';
+        setTimeout(() => { cardEl.style.boxShadow = ''; }, 2000);
+        
+        if (data.updatedBy) {
+          showToast('➕ New card added by ' + data.updatedBy);
+        }
+        
+        updateProgress();
+      }
+    });
+    
+    // Listen for version history to show conflicts
+    const versionsRef = db.ref('versions/' + CONTENT_ID);
+    versionsRef.on('child_added', handleVersionAdded);
+    versionsRef.on('child_changed', handleVersionChanged);
+  }
+}
+
+// Color palette for different authors
+const authorColors = {};
+const colorPalette = ['#f87171', '#fb923c', '#facc15', '#4ade80', '#22d3ee', '#818cf8', '#e879f9', '#f472b6'];
+let colorIndex = 0;
+
+function getAuthorColor(author) {
+  if (!authorColors[author]) {
+    authorColors[author] = colorPalette[colorIndex % colorPalette.length];
+    colorIndex++;
+  }
+  return authorColors[author];
+}
+
+// Handle new version being added
+function handleVersionAdded(snapshot) {
+  const cardIndex = parseInt(snapshot.key);
+  if (isNaN(cardIndex)) return;
+  
+  // Check for recent versions (within last 30 seconds) from different authors
+  checkForConflicts(cardIndex);
+}
+
+// Handle version changes
+function handleVersionChanged(snapshot) {
+  const cardIndex = parseInt(snapshot.key);
+  if (isNaN(cardIndex)) return;
+  
+  checkForConflicts(cardIndex);
+}
+
+// Check for conflicts and show version history if multiple recent edits
+async function checkForConflicts(cardIndex) {
+  if (!db || !CONTENT_ID) return;
+  
+  const versionsRef = db.ref('versions/' + CONTENT_ID + '/' + cardIndex);
+  const snapshot = await versionsRef.orderByChild('timestamp').limitToLast(5).once('value');
+  const versions = snapshot.val();
+  
+  if (!versions) return;
+  
+  const versionArray = Object.values(versions);
+  const now = Date.now();
+  const recentThreshold = 60000; // 1 minute
+  
+  // Filter to recent versions
+  const recentVersions = versionArray.filter(v => now - v.timestamp < recentThreshold);
+  
+  // Check if multiple authors edited recently
+  const authors = [...new Set(recentVersions.map(v => v.author))];
+  
+  if (authors.length > 1) {
+    // Conflict detected! Show version comparison UI
+    showConflictUI(cardIndex, recentVersions);
+  }
+}
+
+// Show conflict resolution UI
+function showConflictUI(cardIndex, versions) {
+  const cardElements = document.querySelectorAll('.card');
+  if (!cardElements[cardIndex]) return;
+  
+  const cardEl = cardElements[cardIndex];
+  
+  // Check if conflict panel already exists
+  let conflictPanel = cardEl.querySelector('.conflict-panel');
+  if (conflictPanel) {
+    // Update existing panel
+    updateConflictPanel(conflictPanel, versions);
+    return;
+  }
+  
+  // Create conflict panel
+  conflictPanel = document.createElement('div');
+  conflictPanel.className = 'conflict-panel';
+  conflictPanel.style.cssText = 'position:absolute;left:0;right:0;bottom:0;background:#1a1a2e;border-top:2px solid #f59e0b;padding:8px;z-index:100;max-height:150px;overflow-y:auto;border-radius:0 0 8px 8px;';
+  
+  updateConflictPanel(conflictPanel, versions);
+  
+  cardEl.style.position = 'relative';
+  cardEl.appendChild(conflictPanel);
+  
+  // Auto-hide after 30 seconds
+  setTimeout(() => {
+    if (conflictPanel.parentNode) {
+      conflictPanel.remove();
+    }
+  }, 30000);
+}
+
+// Update conflict panel content
+function updateConflictPanel(panel, versions) {
+  // Sort by timestamp (newest first)
+  const sorted = [...versions].sort((a, b) => b.timestamp - a.timestamp);
+  
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:11px;color:#f59e0b;font-weight:600;">⚠️ Multiple edits detected</span><button onclick="this.closest(\'.conflict-panel\').remove()" style="background:none;border:none;color:#888;cursor:pointer;font-size:14px;">✕</button></div>';
+  
+  sorted.slice(0, 3).forEach(version => {
+    const color = version.color || getAuthorColor(version.author);
+    const time = new Date(version.timestamp).toLocaleTimeString();
+    html += `
+      <div style="border-left:3px solid ${color};padding:4px 8px;margin:4px 0;background:#252525;border-radius:0 4px 4px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;color:${color};font-weight:600;">${version.author}</span>
+          <span style="font-size:9px;color:#666;">${time}</span>
+        </div>
+        <div style="font-size:11px;color:#ccc;margin-top:2px;max-height:40px;overflow:hidden;">${version.content.substring(0, 100)}${version.content.length > 100 ? '...' : ''}</div>
+        <button onclick="applyVersion(${panel.closest('.card') ? Array.from(document.querySelectorAll('.card')).indexOf(panel.closest('.card')) : 0}, '${btoa(unescape(encodeURIComponent(version.title)))}', '${btoa(unescape(encodeURIComponent(version.content)))}')" style="background:#4ade80;color:#1a1a1a;border:none;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;margin-top:4px;">Use this version</button>
+      </div>
+    `;
+  });
+  
+  panel.innerHTML = html;
+}
+
+// Apply a specific version
+function applyVersion(cardIndex, encodedTitle, encodedContent) {
+  const title = decodeURIComponent(escape(atob(encodedTitle)));
+  const content = decodeURIComponent(escape(atob(encodedContent)));
+  
+  // Update local data
+  if (cardsData[cardIndex]) {
+    cardsData[cardIndex].title = title;
+    cardsData[cardIndex].content = content;
+  }
+  
+  // Update DOM
+  const cardElements = document.querySelectorAll('.card');
+  if (cardElements[cardIndex]) {
+    const cardEl = cardElements[cardIndex];
+    const titleEl = cardEl.querySelector('.card-title');
+    const contentEl = cardEl.querySelector('.card-content');
+    if (titleEl) titleEl.innerHTML = renderContent(title);
+    if (contentEl) contentEl.innerHTML = renderContent(content);
+    
+    // Remove conflict panel
+    const conflictPanel = cardEl.querySelector('.conflict-panel');
+    if (conflictPanel) conflictPanel.remove();
+  }
+  
+  // Save this as the new version
+  if (cardsRef) {
+    cardsRef.child(cardIndex.toString()).set({
+      title: title,
+      content: content,
+      updatedBy: localNickname || 'Anonymous',
+      updatedAt: Date.now()
+    });
+  }
+  
+  showToast('✅ Version applied');
+}
+
+// Enable inline editing for all cards (Google Docs style)
+function enableInlineEditing() {
+  const cardElements = document.querySelectorAll('.card');
+  
+  cardElements.forEach((cardEl, cardIndex) => {
+    const titleEl = cardEl.querySelector('.card-title');
+    const contentEl = cardEl.querySelector('.card-content');
+    
+    // Make title and content editable
+    if (titleEl) {
+      titleEl.setAttribute('contenteditable', 'true');
+      titleEl.style.cursor = 'text';
+      titleEl.style.outline = 'none';
+      titleEl.style.borderBottom = '1px dashed transparent';
+      titleEl.addEventListener('focus', () => {
+        titleEl.style.borderBottom = '1px dashed #4ade80';
+        // Track which card is being edited
+        window.currentlyEditingCard = cardIndex;
+      });
+      titleEl.addEventListener('blur', () => {
+        titleEl.style.borderBottom = '1px dashed transparent';
+        // Clear editing state after a delay (to allow saves to complete)
+        setTimeout(() => {
+          if (window.currentlyEditingCard === cardIndex) {
+            window.currentlyEditingCard = null;
+          }
+        }, 1000);
+      });
+      titleEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
+    }
+    
+    if (contentEl) {
+      contentEl.setAttribute('contenteditable', 'true');
+      contentEl.style.cursor = 'text';
+      contentEl.style.outline = 'none';
+      contentEl.style.border = '1px dashed transparent';
+      contentEl.style.borderRadius = '4px';
+      contentEl.style.padding = '4px';
+      contentEl.style.minHeight = '50px';
+      contentEl.addEventListener('focus', () => {
+        contentEl.style.border = '1px dashed #4ade80';
+        window.currentlyEditingCard = cardIndex;
+      });
+      contentEl.addEventListener('blur', () => {
+        contentEl.style.border = '1px dashed transparent';
+        setTimeout(() => {
+          if (window.currentlyEditingCard === cardIndex) {
+            window.currentlyEditingCard = null;
+          }
+        }, 1000);
+      });
+      contentEl.addEventListener('input', () => debounceSaveCard(cardIndex, titleEl, contentEl));
+    }
+    
+    // Hide the edit button since we're doing inline editing
+    const editBtn = cardEl.querySelector('.edit-btn');
+    if (editBtn) editBtn.style.display = 'none';
+  });
+  
+  console.log('[EditSystem] Inline editing enabled for all cards');
+}
+
+// Debounce save to prevent too many Firebase writes
+function debounceSaveCard(cardIndex, titleEl, contentEl) {
+  // Clear existing timer for this card
+  if (saveDebounceTimers[cardIndex]) {
+    clearTimeout(saveDebounceTimers[cardIndex]);
+  }
+  
+  // Set new timer
+  saveDebounceTimers[cardIndex] = setTimeout(() => {
+    saveCardToFirebase(cardIndex, titleEl, contentEl);
+  }, 500);  // Save 500ms after user stops typing
+}
+
+// Save card content to Firebase
+async function saveCardToFirebase(cardIndex, titleEl, contentEl) {
+  if (!cardsRef) return;
+  
+  const newTitle = titleEl ? titleEl.innerText.trim() : '';
+  const newContent = contentEl ? contentEl.innerText.trim() : '';
+  
+  // Update local data
+  if (cardsData[cardIndex]) {
+    cardsData[cardIndex].title = newTitle;
+    cardsData[cardIndex].content = newContent;
+  }
+  
+  try {
+    await cardsRef.child(cardIndex.toString()).set({
+      title: newTitle,
+      content: newContent,
+      updatedBy: localNickname || 'Anonymous',
+      updatedAt: Date.now()
+    });
+    // Small visual feedback
+    const indicator = document.createElement('span');
+    indicator.innerHTML = '✓';
+    indicator.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#22c55e;color:white;padding:8px 16px;border-radius:8px;font-size:14px;z-index:10000;animation:fadeOut 1s forwards;';
+    document.body.appendChild(indicator);
+    setTimeout(() => indicator.remove(), 1000);
+  } catch (err) {
+    console.error('[EditSystem] Error saving card:', err);
+  }
+}
+
+function openEditModal(cardIndex) {
+  if (!FIREBASE_URL || !OWNER_ID) {
+    showToast('❌ Edit suggestions not available for this content');
+    return;
+  }
+  
+  currentEditCardIndex = cardIndex;
+  const card = cardsData[cardIndex];
+  
+  // Different modal based on permission level
+  const modalTitle = FULL_PERMISSION ? '✏️ Edit Card' : '✏️ Suggest Edit';
+  const modalDesc = FULL_PERMISSION 
+    ? 'Edit this card directly. Changes will be saved and synced to all viewers in real-time.'
+    : 'Suggest an improvement for this card. The content owner will be notified and can choose to accept or reject your edit.';
+  const submitBtnText = FULL_PERMISSION ? 'Save Changes' : 'Submit Suggestion';
+  const noteField = FULL_PERMISSION ? '' : `
+        <label class="edit-label" style="margin-top:1rem">Your Note (optional)</label>
+        <input type="text" id="editNote" class="edit-input" placeholder="Explain your changes...">`;
+  
+  // Create modal
+  const modal = document.createElement('div');
+  modal.id = 'editModal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="edit-modal-content">
+      <div class="edit-modal-header">
+        <h3>${modalTitle}</h3>
+        <button class="edit-modal-close" onclick="closeEditModal()">✕</button>
+      </div>
+      <div class="edit-modal-body">
+        <p style="color:var(--text-secondary);margin-bottom:1rem;font-size:0.9rem">
+          ${modalDesc}
+        </p>
+        <label class="edit-label">Card Title</label>
+        <input type="text" id="editTitle" class="edit-input" placeholder="Card title...">
+        
+        <label class="edit-label" style="margin-top:1rem">Content</label>
+        <textarea id="editContent" class="edit-textarea" placeholder="Improved content..."></textarea>
+        ${noteField}
+      </div>
+      <div class="edit-modal-footer">
+        <button class="edit-btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button class="edit-btn-submit" onclick="submitEdit()">${submitBtnText}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  // Set values after DOM is created (to avoid escaping issues)
+  // Strip HTML for clean editing
+  document.getElementById('editTitle').value = stripHtml(card.title || '');
+  document.getElementById('editContent').value = stripHtml(card.content || '');
+  
+  setTimeout(() => modal.classList.add('open'), 10);
+}
+
+function closeEditModal() {
+  const modal = document.getElementById('editModal');
+  if (modal) {
+    modal.classList.remove('open');
+    setTimeout(() => modal.remove(), 300);
+  }
+  currentEditCardIndex = null;
+}
+
+async function submitEdit() {
+  if (currentEditCardIndex === null) return;
+  
+  const newTitle = document.getElementById('editTitle')?.value.trim() || '';
+  const newContent = document.getElementById('editContent')?.value.trim() || '';
+  const originalCard = cardsData[currentEditCardIndex];
+  
+  // Check if anything changed
+  if (newTitle === originalCard.title && newContent === originalCard.content) {
+    showToast('⚠️ No changes detected');
+    return;
+  }
+  
+  // FULL PERMISSION MODE: Save directly and sync to all viewers
+  if (FULL_PERMISSION) {
+    try {
+      const editerId = localNickname || 'Anonymous';
+      const timestamp = Date.now();
+      
+      // Instead of overwriting, add this version as a new entry
+      // The card will show all recent versions color-coded
+      if (cardsRef) {
+        // Save to versions history for this card
+        const versionsRef = db.ref('versions/' + CONTENT_ID + '/' + currentEditCardIndex);
+        
+        // Push new version
+        await versionsRef.push({
+          title: newTitle,
+          content: newContent,
+          author: editerId,
+          color: getAuthorColor(editerId),
+          timestamp: timestamp
+        });
+        
+        // Also update the main card data (latest wins for display)
+        await cardsRef.child(currentEditCardIndex.toString()).set({
+          title: newTitle,
+          content: newContent,
+          updatedBy: editerId,
+          updatedAt: timestamp
+        });
+        
+        console.log('[EditSystem] Version saved to Firebase');
+      }
+      
+      // Update local cardsData
+      cardsData[currentEditCardIndex].title = newTitle;
+      cardsData[currentEditCardIndex].content = newContent;
+      
+      // Update the card in the DOM
+      const cardElements = document.querySelectorAll('.card');
+      if (cardElements[currentEditCardIndex]) {
+        const cardEl = cardElements[currentEditCardIndex];
+        const titleEl = cardEl.querySelector('.card-title');
+        const contentEl = cardEl.querySelector('.card-content');
+        if (titleEl) titleEl.innerHTML = renderContent(newTitle);
+        if (contentEl) contentEl.innerHTML = renderContent(newContent);
+      }
+      
+      showToast('✅ Card updated successfully!');
+    } catch (err) {
+      console.error('[EditSystem] Error saving edit:', err);
+      showToast('❌ Failed to save: ' + err.message);
+    }
+    closeEditModal();
+    return;
+  }
+  
+  // SUGGESTION MODE: Submit for owner approval
+  const note = document.getElementById('editNote')?.value.trim() || '';
+  const editData = {
+    cardIndex: currentEditCardIndex,
+    originalTitle: originalCard.title,
+    originalContent: originalCard.content,
+    newTitle: newTitle,
+    newContent: newContent,
+    note: note,
+    submittedBy: localNickname || 'Anonymous',
+    submittedAt: Date.now(),
+    status: 'pending',
+    ownerId: OWNER_ID,
+    lessonName: LESSON_NAME
+  };
+  
+  console.log('[EditSystem] Submitting edit:', editData);
+  console.log('[EditSystem] editRef:', editRef, 'CONTENT_ID:', CONTENT_ID);
+  
+  try {
+    if (editRef) {
+      await editRef.push(editData);
+      console.log('[EditSystem] Edit pushed successfully');
+      showToast('✅ Edit suggestion submitted! The owner will be notified.');
+    } else {
+      console.log('[EditSystem] No editRef - saving locally');
+      // Fallback: save to localStorage for demo purposes
+      const key = 'atlas-pending-edits-' + CONTENT_ID;
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      existing.push(editData);
+      localStorage.setItem(key, JSON.stringify(existing));
+      showToast('✅ Edit saved locally (Firebase not available)');
+    }
+  } catch (err) {
+    console.error('[EditSystem] Error submitting edit:', err);
+    showToast('❌ Failed to submit edit: ' + err.message);
+  }
+  
+  closeEditModal();
+}
+
+// Initialize edit system after chat init
+setTimeout(initEditSystem, 1000);
+</script>
+</body>
+</html>
