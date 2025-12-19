@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dsasdadsa - Notes View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initMath()"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+/* Reset and Base */
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* Theme Variables - Dark (default) */
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-card: #1a1a1a;
+  --bg-elevated: #242424;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  --accent: #22c55e;
+  --accent-light: #4ade80;
+  --accent-glow: rgba(34, 197, 94, 0.15);
+  --border: #2a2a2a;
+  --shadow: 0 4px 20px rgba(0,0,0,0.4);
+  --heading-font: 'Inter', sans-serif;
+  --body-font: 'Inter', sans-serif;
+  --mono-font: 'Fira Code', monospace;
+}
+
+/* Light Theme */
+:root.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-elevated: #f1f3f4;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --accent: #16a34a;
+  --accent-glow: rgba(22, 163, 74, 0.1);
+  --border: #e0e0e0;
+  --shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Lain Theme - Cyberpunk terminal aesthetic */
+:root.theme-lain {
+  --bg-primary: #000000;
+  --bg-secondary: #0d0d0d;
+  --bg-card: #0d0d0d;
+  --bg-elevated: #1a1a1a;
+  --text-primary: #c0ffc0;
+  --text-secondary: #709070;
+  --text-muted: #4a5a4a;
+  --accent: #00ff41;
+  --accent-light: #98fb98;
+  --accent-glow: rgba(0, 255, 65, 0.15);
+  --border: #1a1a1a;
+  --shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+  --heading-font: 'Fira Code', monospace;
+  --body-font: 'Fira Code', monospace;
+  --lain-amber: #ffab00;
+}
+
+/* Lain Theme - CRT Scanlines effect */
+:root.theme-lain body {
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.9),
+      rgba(0, 0, 0, 0.9) 2px,
+      rgba(0, 255, 65, 0.015) 2px,
+      rgba(0, 255, 65, 0.015) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 4px,
+      rgba(0, 255, 65, 0.008) 4px,
+      rgba(0, 255, 65, 0.008) 5px
+    ),
+    radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+  background-size: 100% 3px, 5px 100%, 100% 100%;
+  background-color: var(--bg-primary);
+}
+
+/* Lain Theme - Special text effects */
+:root.theme-lain .note-content {
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+  animation: lainGlow 3s ease-in-out infinite;
+}
+
+@keyframes lainGlow {
+  0%, 100% { text-shadow: 0 0 8px rgba(0, 255, 65, 0.4); }
+  50% { text-shadow: 0 0 12px rgba(0, 255, 65, 0.6); }
+}
+
+:root.theme-lain h1, :root.theme-lain h2, :root.theme-lain h3,
+:root.theme-lain h4, :root.theme-lain h5, :root.theme-lain h6 {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px rgba(152, 251, 152, 0.5);
+}
+
+:root.theme-lain .note-content strong {
+  color: var(--lain-amber);
+  text-shadow: 0 0 5px rgba(255, 165, 2, 0.4);
+}
+
+:root.theme-lain .note-content em {
+  color: #00cc33;
+}
+
+:root.theme-lain code {
+  background: rgba(0, 255, 65, 0.1);
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  color: #00ff41;
+}
+
+:root.theme-lain pre {
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+}
+
+:root.theme-lain blockquote {
+  border-left-color: #00ff41;
+  background: rgba(0, 255, 65, 0.05);
+}
+
+/* Sakura Theme - Pink/purple artistic aesthetic */
+:root.theme-sakura {
+  --bg-primary: #1a1215;
+  --bg-secondary: #211419;
+  --bg-card: #2a1a21;
+  --bg-elevated: #352027;
+  --text-primary: #f8e8f0;
+  --text-secondary: #c89ab0;
+  --text-muted: #a07888;
+  --accent: #ec4899;
+  --accent-light: #f472b6;
+  --accent-glow: rgba(236, 72, 153, 0.2);
+  --border: rgba(236, 72, 153, 0.3);
+  --shadow: 0 4px 20px rgba(236, 72, 153, 0.15);
+  --sakura-purple: #a855f7;
+}
+
+:root.theme-sakura body {
+  background-image:
+    repeating-conic-gradient(from 30deg at 25% 75%, transparent 0deg, rgba(236,72,153,0.015) 60deg, transparent 120deg, rgba(168,85,247,0.01) 180deg, transparent 240deg),
+    repeating-linear-gradient(73deg, transparent, transparent 12px, rgba(236,72,153,0.01) 12px, rgba(236,72,153,0.01) 13px);
+  background-size: 40px 40px, 25px 25px;
+  background-color: var(--bg-primary);
+}
+
+:root.theme-sakura .note-title {
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-bottom-color: rgba(236, 72, 153, 0.3);
+}
+
+:root.theme-sakura h1, :root.theme-sakura h2, :root.theme-sakura h3 {
+  color: #f472b6;
+}
+
+:root.theme-sakura .note-content strong {
+  color: #ec4899;
+}
+
+:root.theme-sakura code {
+  background: rgba(236, 72, 153, 0.15);
+  color: #f472b6;
+  border: 1px solid rgba(236, 72, 153, 0.25);
+}
+
+:root.theme-sakura blockquote {
+  border-left-color: #ec4899;
+  background: rgba(236, 72, 153, 0.08);
+}
+
+:root.theme-sakura a {
+  color: #a855f7;
+}
+
+/* Nonov Theme - Dark purple with green accents */
+:root.theme-nonov {
+  --bg-primary: #1a181f;
+  --bg-secondary: #1e1c23;
+  --bg-card: #25222b;
+  --bg-elevated: #2d2a35;
+  --text-primary: #ededed;
+  --text-secondary: #a5a5a5;
+  --text-muted: #666666;
+  --accent: #7b00ba;
+  --accent-light: #9b20da;
+  --accent-glow: rgba(123, 0, 186, 0.2);
+  --border: #403a4d;
+  --shadow: 0 4px 20px rgba(123, 0, 186, 0.15);
+  --nonov-green: #10b981;
+}
+
+:root.theme-nonov .note-title {
+  color: #9b20da;
+  text-shadow: 0 0 10px rgba(123, 0, 186, 0.4);
+}
+
+:root.theme-nonov h1, :root.theme-nonov h2, :root.theme-nonov h3 {
+  color: #9b20da;
+  text-shadow: 0 0 8px rgba(123, 0, 186, 0.3);
+}
+
+:root.theme-nonov .note-content strong {
+  color: #10b981;
+}
+
+:root.theme-nonov code {
+  background: rgba(123, 0, 186, 0.15);
+  color: #9b20da;
+  border: 1px solid rgba(123, 0, 186, 0.3);
+}
+
+:root.theme-nonov blockquote {
+  border-left-color: #7b00ba;
+  background: rgba(123, 0, 186, 0.08);
+}
+
+:root.theme-nonov a {
+  color: #10b981;
+}
+
+/* Body */
+body {
+  font-family: var(--body-font);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.theme-selector {
+  position: relative;
+}
+
+.theme-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.theme-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.theme-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem;
+  display: none;
+  min-width: 150px;
+  box-shadow: var(--shadow);
+}
+
+.theme-menu.open { display: block; }
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.theme-option:hover { background: var(--bg-elevated); color: var(--text-primary); }
+.theme-option.active { background: var(--accent-glow); color: var(--accent); }
+
+.theme-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.theme-dot.dark { background: #1a1a1a; border: 1px solid #333; }
+.theme-dot.light { background: #ffffff; border: 1px solid #ddd; }
+.theme-dot.lain { background: #00ff41; }
+.theme-dot.sakura { background: #f48fb1; }
+.theme-dot.nonov { background: #a78bfa; }
+
+/* Container */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+/* Lesson Header */
+.lesson-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.lesson-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.lesson-meta {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Table of Contents */
+.toc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.toc h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.toc ol {
+  list-style-position: inside;
+  padding: 0;
+}
+
+.toc li {
+  margin-bottom: 0.5rem;
+}
+
+.toc a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.toc a:hover {
+  color: var(--accent);
+}
+
+/* Note Sections */
+.note-section {
+  margin-bottom: 3rem;
+  scroll-margin-top: 100px;
+}
+
+.note-title {
+  font-family: var(--heading-font);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--accent-glow);
+}
+
+/* Content Typography */
+.note-content {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.note-content h1, .note-content h2, .note-content h3,
+.note-content h4, .note-content h5, .note-content h6 {
+  font-family: var(--heading-font);
+  color: var(--text-primary);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.note-content h1 { font-size: 2rem; }
+.note-content h2 { font-size: 1.6rem; }
+.note-content h3 { font-size: 1.35rem; }
+.note-content h4 { font-size: 1.15rem; }
+
+.note-content p {
+  margin-bottom: 1.25rem;
+}
+
+.note-content ul, .note-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.note-content li {
+  margin-bottom: 0.5rem;
+}
+
+.note-content code {
+  font-family: var(--mono-font);
+  background: var(--bg-elevated);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--accent);
+}
+
+.note-content pre {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.note-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--text-primary);
+}
+
+.note-content blockquote {
+  border-left: 4px solid var(--accent);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background: var(--accent-glow);
+  border-radius: 0 10px 10px 0;
+  color: var(--text-primary);
+  font-style: italic;
+}
+
+.note-content img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 1.5rem 0;
+  box-shadow: var(--shadow);
+}
+
+.note-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.note-content th, .note-content td {
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.note-content th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+}
+
+.note-content a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.note-content a:hover {
+  text-decoration: underline;
+}
+
+/* Highlight Effects - Matching app text effects */
+.note-content mark, .note-content .highlight {
+  background: linear-gradient(120deg, var(--accent-glow) 0%, transparent 100%);
+  padding: 0.1em 0.2em;
+  border-radius: 3px;
+}
+
+.note-content strong {
+  font-weight: 600;
+  color: var(--accent-light);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  margin-top: 3rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Print styles */
+@media print {
+  .header, .theme-selector { display: none !important; }
+  body { background: white; color: black; }
+  .note-content { color: black; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container { padding: 1.5rem 1rem; }
+  .lesson-header h1 { font-size: 1.75rem; }
+  .note-title { font-size: 1.35rem; }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <h1>📚 dsasdadsa</h1>
+  <div class="header-controls">
+    <div class="theme-selector">
+      <button class="theme-btn" onclick="toggleThemeMenu()">
+        <span id="themeIcon">🌙</span>
+        <span id="themeName">Dark</span>
+      </button>
+      <div class="theme-menu" id="themeMenu">
+        <button class="theme-option active" onclick="setTheme('dark')" data-theme="dark">
+          <span class="theme-dot dark"></span> Dark
+        </button>
+        <button class="theme-option" onclick="setTheme('light')" data-theme="light">
+          <span class="theme-dot light"></span> Light
+        </button>
+        <button class="theme-option" onclick="setTheme('lain')" data-theme="lain">
+          <span class="theme-dot lain"></span> Lain 💻
+        </button>
+        <button class="theme-option" onclick="setTheme('sakura')" data-theme="sakura">
+          <span class="theme-dot sakura"></span> Sakura 🌸
+        </button>
+        <button class="theme-option" onclick="setTheme('nonov')" data-theme="nonov">
+          <span class="theme-dot nonov"></span> Nonov 💜
+        </button>
+      </div>
+    </div>
+    <button class="theme-btn" onclick="window.print()" title="Print notes">
+      🖨️ Print
+    </button>
+  </div>
+</header>
+
+<main class="container">
+  <div class="lesson-header">
+    <h1>dsasdadsa</h1>
+    <p class="lesson-meta">Notes View • Created with ATLAS Face</p>
+  </div>
+  
+  
+  
+  <article class="notes-body">
+    <section class="note-section" id="notes-content">
+      <div class="note-content markdown-content"><h1>This is the way</h1><p>to sparts</p></div>
+    </section>
+  </article>
+</main>
+
+<footer class="footer">
+  <p>Created with <a href="https://github.com/atlas-face" target="_blank">ATLAS Face</a> • Your AI-Powered Learning Companion</p>
+</footer>
+
+<script>
+// Math rendering
+function initMath() {
+  if (typeof renderMathInElement !== 'undefined') {
+    try {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+      });
+    } catch(e) { console.warn('Math render error:', e); }
+  }
+}
+
+// Markdown rendering
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof marked !== 'undefined') {
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+      headerIds: false,
+      mangle: false
+    });
+    
+    document.querySelectorAll('.note-content').forEach(el => {
+      const raw = el.innerHTML;
+      if (raw.includes('#') || raw.includes('*') || raw.includes('`') || raw.includes('[')) {
+        try {
+          el.innerHTML = marked.parse(raw);
+        } catch(e) { console.warn('Markdown error:', e); }
+      }
+    });
+  }
+  
+  // Init math after markdown
+  setTimeout(initMath, 100);
+});
+
+// Theme management
+const themes = {
+  dark: { icon: '🌙', name: 'Dark' },
+  light: { icon: '☀️', name: 'Light' },
+  lain: { icon: '💻', name: 'Lain' },
+  sakura: { icon: '🌸', name: 'Sakura' },
+  nonov: { icon: '💜', name: 'Nonov' }
+};
+
+let currentTheme = localStorage.getItem('atlas-notes-theme') || 'dark';
+
+function setTheme(theme) {
+  currentTheme = theme;
+  localStorage.setItem('atlas-notes-theme', theme);
+  
+  document.documentElement.className = '';
+  if (theme !== 'dark') {
+    document.documentElement.classList.add('theme-' + theme);
+  }
+  
+  document.getElementById('themeIcon').textContent = themes[theme].icon;
+  document.getElementById('themeName').textContent = themes[theme].name;
+  
+  document.querySelectorAll('.theme-option').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  
+  toggleThemeMenu(false);
+}
+
+function toggleThemeMenu(forceState) {
+  const menu = document.getElementById('themeMenu');
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : !menu.classList.contains('open');
+  menu.classList.toggle('open', shouldOpen);
+}
+
+// Close menu on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.theme-selector')) {
+    toggleThemeMenu(false);
+  }
+});
+
+// Apply saved theme
+setTheme(currentTheme);
+</script>
+</body>
+</html>
